@@ -1,0 +1,51 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">Purchase Report</h2>
+
+    {% if purchases %}
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Receipt No</th>
+                <th>Supplier</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for purchase in purchases %}
+
+        <tr>
+            <td>{{ purchase.name }}</td>
+            <td>{{ purchase.supplier }}</td>
+            <td>{{ purchase.posting_date }}</td>
+            <td>₹ {{ purchase.grand_total }}</td>
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div class="alert alert-info">
+        No purchase records found.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

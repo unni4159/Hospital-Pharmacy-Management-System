@@ -5,6 +5,8 @@ app_description = "Hospital Pharmacy"
 app_email = "unnikrishnanar8474@gmail.com"
 app_license = "mit"
 
+login_redirect_url = "/home"
+
 # Apps
 # ------------------
 

@@ -1,0 +1,41 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container mt-5">
+
+    <h2>Low Stock Report</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Item Code</th>
+                <th>Medicine</th>
+                <th>Unit</th>
+                <th>Available Stock</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for item in stock_items %}
+
+        {% if item.available_stock < 20 %}
+
+        <tr class="table-danger">
+            <td>{{ item.item_code }}</td>
+            <td>{{ item.item_name }}</td>
+            <td>{{ item.stock_uom }}</td>
+            <td>{{ item.available_stock }}</td>
+        </tr>
+
+        {% endif %}
+
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

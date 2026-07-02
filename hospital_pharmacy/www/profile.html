@@ -1,0 +1,49 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container mt-5">
+
+    <div class="card">
+
+        <div class="card-header bg-primary text-white">
+            <h3>👤 My Profile</h3>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table">
+
+                <tr>
+                    <th>Name</th>
+                    <td>{{ user.full_name }}</td>
+                </tr>
+
+                <tr>
+                    <th>Email</th>
+                    <td>{{ user.email }}</td>
+                </tr>
+
+                <tr>
+                    <th>Username</th>
+                    <td>{{ user.name }}</td>
+                </tr>
+
+                <tr>
+                    <th>Roles</th>
+                    <td>
+                        {% for role in roles %}
+                            <span class="badge bg-primary">{{ role }}</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

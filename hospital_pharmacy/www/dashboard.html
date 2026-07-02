@@ -1,0 +1,51 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container mt-5">
+
+    <h2>Hospital Pharmacy Dashboard</h2>
+
+    <div class="row mt-4">
+
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h1>{{ total_medicines }}</h1>
+                    <h5>Total Medicines</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h1>{{ total_customers }}</h1>
+                    <h5>Total Customers</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h1>{{ total_sales }}</h1>
+                    <h5>Total Sales</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h1>{{ total_suppliers }}</h1>
+                    <h5>Total Suppliers</h5>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2>Customer Registration</h2>
+
+    <form id="register-form">
+
+        <div class="mb-3">
+            <label>Customer Name</label>
+            <input type="text" id="customer_name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="email" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Mobile Number</label>
+            <input type="text" id="mobile" class="form-control" required>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary"
+                onclick="register_customer()">
+            Register
+        </button>
+
+    </form>
+
+</div>
+
+<script>
+
+function register_customer(){
+
+    frappe.call({
+
+        method:"hospital_pharmacy.hospital_pharmacy.api.register_customer",
+
+        args:{
+
+            customer_name:$("#customer_name").val(),
+            email:$("#email").val(),
+            mobile:$("#mobile").val()
+
+        },
+
+        callback:function(r){
+
+            if(!r.exc){
+
+                frappe.msgprint("Customer Registered Successfully");
+
+                window.location="/checkout";
+
+            }
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

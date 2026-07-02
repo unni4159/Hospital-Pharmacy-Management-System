@@ -1,0 +1,53 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">Sales Report</h2>
+
+    {% if sales %}
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Invoice No</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for sale in sales %}
+
+        <tr>
+            <td>{{ sale.name }}</td>
+            <td>{{ sale.customer }}</td>
+            <td>{{ sale.posting_date }}</td>
+            <td>₹ {{ sale.grand_total }}</td>
+            <td>{{ sale.status }}</td>
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div class="alert alert-info">
+        No sales invoices found.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

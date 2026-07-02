@@ -1,0 +1,49 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container mt-5">
+
+    <h2>📦 Order History</h2>
+
+    <table class="table table-bordered mt-4">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Invoice</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for order in orders %}
+
+            <tr>
+                <td>{{ order.name }}</td>
+                <td>{{ order.posting_date }}</td>
+                <td>{{ order.customer }}</td>
+                <td>{{ order.grand_total }}</td>
+                <td>{{ order.status }}</td>
+            </tr>
+
+        {% else %}
+
+            <tr>
+                <td colspan="5" class="text-center">
+                    No orders found.
+                </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

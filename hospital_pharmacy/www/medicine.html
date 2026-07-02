@@ -1,0 +1,61 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+<div class="container mt-5">
+
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            <h2>{{ medicine.item_name }}</h2>
+
+            <hr>
+
+            <table class="table">
+
+                <tr>
+                    <th>Item Code</th>
+                    <td>{{ medicine.item_code }}</td>
+                </tr>
+
+                <tr>
+                    <th>Item Group</th>
+                    <td>{{ medicine.item_group }}</td>
+                </tr>
+
+                <tr>
+                    <th>Unit</th>
+                    <td>{{ medicine.stock_uom }}</td>
+                </tr>
+
+                <tr>
+                    <th>Description</th>
+                    <td>{{ medicine.description or "No Description" }}</td>
+                </tr>
+
+            </table>
+
+            <a href="/cart?item={{ medicine.name }}"
+               class="btn btn-primary">
+                Add to Cart
+            </a>
+
+            <a href="/medicine?name={{ medicine.name }}"
+               class="btn btn-success">
+                View Details
+            </a>
+
+            <a href="/medicines"
+               class="btn btn-secondary">
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

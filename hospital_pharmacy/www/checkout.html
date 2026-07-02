@@ -1,0 +1,139 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">Checkout</h2>
+
+    {% if cart %}
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <h5>Customer</h5>
+            <p>{{ cart.customer }}</p>
+
+            <table class="table table-bordered">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Quantity</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for row in cart.cart_items %}
+
+                <tr>
+                    <td>{{ row.item }}</td>
+                    <td>{{ row.quantity }}</td>
+                    <td>₹ {{ row.rate }}</td>
+                    <td>₹ {{ row.amount }}</td>
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            <h4 class="text-end">
+                Total : ₹ {{ cart.total_amount }}
+            </h4>
+
+            <hr>
+
+            <h4>Delivery Details</h4>
+
+            <div class="mb-3">
+                <label class="form-label">Delivery Address</label>
+
+                <textarea
+                    id="delivery_address"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Enter Delivery Address"
+                    required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+
+                <input
+                    type="text"
+                    id="phone_number"
+                    class="form-control"
+                    placeholder="Enter Phone Number"
+                    required>
+            </div>
+
+            <button
+                class="btn btn-success"
+                onclick="place_order()">
+
+                Place Order
+
+            </button>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-warning">
+        Your shopping cart is empty.
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+
+function place_order() {
+
+    let address = $("#delivery_address").val();
+    let phone = $("#phone_number").val();
+
+    if(address == "" || phone == ""){
+        frappe.msgprint("Please enter delivery address and phone number.");
+        return;
+    }
+
+    frappe.call({
+
+        method: "hospital_pharmacy.api.create_order_from_cart",
+
+        args: {
+            delivery_address: address,
+            phone_number: phone
+        },
+
+        callback: function(r){
+
+            if(!r.exc){
+
+                frappe.msgprint("Order Created Successfully");
+
+                window.location.href="/order_success";
+
+            }
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

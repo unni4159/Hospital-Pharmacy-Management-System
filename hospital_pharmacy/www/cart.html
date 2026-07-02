@@ -1,0 +1,168 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">🛒 Shopping Cart</h2>
+
+    {% if medicine %}
+
+    <div class="card shadow">
+
+        <div class="card-header bg-success text-white">
+            <h4>{{ medicine.item_name }}</h4>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th width="30%">Medicine Name</th>
+                    <td>{{ medicine.item_name }}</td>
+                </tr>
+
+                <tr>
+                    <th>Item Code</th>
+                    <td>{{ medicine.item_code }}</td>
+                </tr>
+
+                <tr>
+                    <th>Price</th>
+                    <td>₹ {{ medicine.standard_rate }}</td>
+                </tr>
+
+                <tr>
+                    <th>Description</th>
+                    <td>{{ medicine.description or "No Description" }}</td>
+                </tr>
+
+                <tr>
+                    <th>Stock Status</th>
+                    <td>
+                        {% if medicine.disabled %}
+                            <span class="badge bg-danger">Unavailable</span>
+                        {% else %}
+                            <span class="badge bg-success">Available</span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+            </table>
+
+            <div class="row">
+                <div class="col-md-4">
+
+                    <label class="form-label">
+                        Quantity
+                    </label>
+
+                    <input
+                        type="number"
+                        id="qty"
+                        class="form-control"
+                        value="1"
+                        min="1">
+
+                </div>
+            </div>
+
+            <br>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                onclick="addToCart()">
+                🛒 Add to Cart
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-success"
+                onclick="goToCheckout()">
+                💳 Proceed to Checkout
+            </button>
+
+            <a href="/medicines" class="btn btn-secondary">
+                ⬅ Continue Shopping
+            </a>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-warning text-center">
+
+        <h5>No medicine selected.</h5>
+
+        <p>Please browse medicines and select one first.</p>
+
+        <a href="/medicines" class="btn btn-primary">
+            💊 Browse Medicines
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+
+function addToCart() {
+
+    let qty = document.getElementById("qty").value;
+
+    frappe.call({
+        method: "hospital_pharmacy.api.add_to_cart",
+        args: {
+            item_code: "{{ medicine.name }}",
+            qty: qty
+        },
+        freeze: true,
+        freeze_message: "Adding item to cart...",
+        callback: function(r) {
+
+            if (r.message && r.message.status === "success") {
+
+                frappe.show_alert({
+                    message: "Item added to cart",
+                    indicator: "green"
+                });
+
+                setTimeout(function () {
+                    window.location.href = "/cart_view";
+                }, 500);
+
+            } else {
+
+                frappe.msgprint(
+                    (r.message && r.message.message)
+                    ? r.message.message
+                    : "Unable to add item to cart."
+                );
+
+            }
+
+        }
+    });
+
+}
+
+function goToCheckout() {
+
+    let qty = document.getElementById("qty").value;
+
+    window.location.href =
+        "/checkout?item={{ medicine.name }}&qty=" + qty;
+
+}
+
+</script>
+
+{% endblock %}

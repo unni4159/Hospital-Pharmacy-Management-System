@@ -1,0 +1,83 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">Order Details</h2>
+
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            <h4>{{ invoice.name }}</h4>
+
+            <hr>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <p><strong>Customer :</strong> {{ invoice.customer }}</p>
+                    <p><strong>Order Date :</strong> {{ invoice.posting_date }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <p><strong>Status :</strong> {{ invoice.status }}</p>
+                    <p><strong>Grand Total :</strong> ₹ {{ invoice.grand_total }}</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+
+            <tr>
+                <th>Medicine</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for item in invoice.items %}
+
+        <tr>
+            <td>{{ item.item_name or item.item_code }}</td>
+            <td>{{ item.qty }}</td>
+            <td>₹ {{ item.rate }}</td>
+            <td>₹ {{ item.amount }}</td>
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="text-end">
+
+        <h3>Total : ₹ {{ invoice.grand_total }}</h3>
+
+    </div>
+
+    <br>
+
+    <a href="/my_orders" class="btn btn-primary">
+        ⬅ Back to My Orders
+    </a>
+
+</div>
+
+{% endblock %}

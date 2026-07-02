@@ -1,0 +1,80 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container mt-5">
+
+    <h2>🔍 Search Medicines</h2>
+
+    <form method="get" action="/search">
+
+        <div class="input-group mb-4">
+
+            <input
+                type="text"
+                name="q"
+                class="form-control"
+                placeholder="Enter medicine name"
+                value="{{ search or '' }}">
+
+            <button class="btn btn-primary">
+                Search
+            </button>
+
+        </div>
+
+    </form>
+
+    {% if medicines %}
+
+    <table class="table table-bordered">
+
+        <thead class="table-dark">
+
+            <tr>
+                <th>Code</th>
+                <th>Medicine</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for medicine in medicines %}
+
+            <tr>
+
+                <td>{{ medicine.item_code }}</td>
+
+                <td>{{ medicine.item_name }}</td>
+
+                <td>₹ {{ medicine.standard_rate }}</td>
+
+                <td>
+                    <a href="/checkout?item={{ medicine.item_code }}"
+                       class="btn btn-success btn-sm">
+                        Buy
+                    </a>
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% elif search %}
+
+    <div class="alert alert-warning">
+        No medicines found.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

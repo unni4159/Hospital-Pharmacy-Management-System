@@ -1,0 +1,54 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container mt-5">
+
+    <div class="text-center">
+        <h1>🏥 Hospital Pharmacy Management System</h1>
+
+        <p class="lead">
+            Welcome to our Online Pharmacy
+        </p>
+
+        <a href="/medicines" class="btn btn-primary btn-lg">
+            Browse Medicines
+        </a>
+    </div>
+
+    <hr>
+
+    <div class="row mt-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h4>💊 Medicines</h4>
+                    <p>View available medicines.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h4>🛒 Easy Ordering</h4>
+                    <p>Add medicines to cart.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h4>💳 Secure Payment</h4>
+                    <p>Fast and secure checkout.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

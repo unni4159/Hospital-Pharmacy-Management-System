@@ -1,0 +1,45 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container mt-5">
+
+    <h2>🏢 Suppliers</h2>
+
+    <table class="table table-bordered table-striped mt-4">
+
+        <thead class="table-primary">
+            <tr>
+                <th>Supplier ID</th>
+                <th>Supplier Name</th>
+                <th>Supplier Group</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for supplier in suppliers %}
+
+            <tr>
+                <td>{{ supplier.name }}</td>
+                <td>{{ supplier.supplier_name }}</td>
+                <td>{{ supplier.supplier_group }}</td>
+            </tr>
+
+            {% else %}
+
+            <tr>
+                <td colspan="3" class="text-center">
+                    No suppliers found.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

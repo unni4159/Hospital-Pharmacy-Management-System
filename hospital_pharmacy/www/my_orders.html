@@ -1,0 +1,63 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">📦 My Orders</h2>
+
+    {% if orders %}
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Invoice No</th>
+                <th>Order Date</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>View</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for order in orders %}
+
+        <tr>
+            <td>{{ order.name }}</td>
+            <td>{{ order.posting_date }}</td>
+            <td>₹ {{ order.grand_total }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+                <a href="/order_details?invoice={{ order.name }}"
+                   class="btn btn-sm btn-primary">
+                    View Details
+                </a>
+            </td>
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div class="alert alert-info">
+        <h5>No Orders Found</h5>
+        <p>You haven't placed any orders yet.</p>
+
+        <a href="/medicines" class="btn btn-primary">
+            Browse Medicines
+        </a>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
