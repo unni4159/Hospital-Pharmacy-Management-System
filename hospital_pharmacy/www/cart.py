@@ -17,7 +17,30 @@ def get_context(context):
     if item_code:
 
         if frappe.db.exists("Item", item_code):
-            context.medicine = frappe.get_doc("Item", item_code)
+
+            medicine = frappe.get_doc("Item", item_code)
+
+            # Get Standard Selling Price
+            medicine.standard_rate = frappe.db.get_value(
+                "Item Price",
+                {
+                    "item_code": medicine.item_code,
+                    "price_list": "Standard Selling"
+                },
+                "price_list_rate"
+            ) or 0
+
+            # Get Available Stock
+            stock = frappe.db.sql("""
+                SELECT COALESCE(SUM(actual_qty), 0)
+                FROM `tabBin`
+                WHERE item_code=%s
+            """, medicine.item_code)[0][0]
+
+            medicine.available_stock = stock
+
+            context.medicine = medicine
+
         else:
             context.error = "Selected medicine does not exist."
 

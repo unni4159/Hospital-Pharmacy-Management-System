@@ -54,18 +54,27 @@
 
                     <hr>
 
-                    <p><strong>Item Code:</strong> {{ medicine.item_code }}</p>
+                    <p>
+                        <strong>Item Code:</strong>
+                        {{ medicine.item_code }}
+                    </p>
 
-                    <p><strong>Unit:</strong> {{ medicine.stock_uom }}</p>
+                    <p>
+                        <strong>Unit:</strong>
+                        {{ medicine.stock_uom }}
+                    </p>
 
-                    <p><strong>Price:</strong> ₹ {{ medicine.standard_rate }}</p>
+                    <p>
+                        <strong>Price:</strong>
+                        ₹ {{ medicine.standard_rate }}
+                    </p>
 
                     <p>
                         <strong>Available Stock:</strong>
 
                         {% if medicine.available_stock > 0 %}
                             <span class="badge bg-success">
-                                {{ medicine.available_stock }}
+                                In Stock ({{ medicine.available_stock }})
                             </span>
                         {% else %}
                             <span class="badge bg-danger">
@@ -83,16 +92,19 @@
 
                         {% if medicine.available_stock > 0 %}
 
-                        <a href="/cart?item={{ medicine.name }}"
-                           class="btn btn-primary">
-                            🛒 Add to Cart
-                        </a>
+                            <a href="/cart?item={{ medicine.name }}"
+                               class="btn btn-primary">
+                                🛒 Add to Cart
+                            </a>
 
                         {% else %}
 
-                        <button class="btn btn-secondary" disabled>
-                            Out of Stock
-                        </button>
+                            <button
+                                class="btn btn-secondary"
+                                disabled
+                                title="This medicine is currently unavailable">
+                                ❌ Out of Stock
+                            </button>
 
                         {% endif %}
 
