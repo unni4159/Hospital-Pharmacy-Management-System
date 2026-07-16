@@ -194,11 +194,16 @@ function addToCart() {
 }
 
 function goToCheckout() {
-
-    let qty = document.getElementById("qty").value;
-
-    window.location.href =
-        "/checkout?item={{ medicine.name }}&qty=" + qty;
+    frappe.call({
+        method: "hospital_pharmacy.api.submit_sales_order_for_checkout",
+        freeze: true,
+        freeze_message: "Preparing checkout...",
+        callback: function(r) {
+            if (r.message && r.message.status === "success") {
+                window.location.href = "/checkout";
+            }
+        }
+    });
 
 }
 

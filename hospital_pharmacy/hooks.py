@@ -248,4 +248,7 @@ login_redirect_url = "/home"
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
+# app_include_css = "/assets/hospital_pharmacy/css/style.css"
+web_include_css = "/assets/hospital_pharmacy/css/style.css?v=nav-contrast-2"
 
+on_login = "hospital_pharmacy.api.on_login"

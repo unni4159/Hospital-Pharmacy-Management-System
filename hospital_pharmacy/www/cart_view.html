@@ -64,10 +64,11 @@
 
     <div class="mt-3">
 
-        <a href="/checkout?cart={{ cart.name }}"
-           class="btn btn-success">
+        <button type="button"
+           class="btn btn-success"
+           onclick="proceedToCheckout()">
             💳 Proceed to Checkout
-        </a>
+        </button>
 
         <a href="/medicines"
            class="btn btn-secondary">
@@ -94,6 +95,19 @@
 </div>
 
 <script>
+
+function proceedToCheckout() {
+    frappe.call({
+        method: "hospital_pharmacy.api.submit_sales_order_for_checkout",
+        freeze: true,
+        freeze_message: "Preparing checkout...",
+        callback: function(r) {
+            if (r.message && r.message.status === "success") {
+                window.location.href = "/checkout";
+            }
+        }
+    });
+}
 
 function removeItem(item_code){
 

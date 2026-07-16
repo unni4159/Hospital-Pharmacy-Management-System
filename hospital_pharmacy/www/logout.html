@@ -1,0 +1,10 @@
+{% extends "templates/web.html" %}
+{% block page_content %}
+<div class="container mt-5 text-center">
+    <h3>Logging out...</h3>
+    <p>If you are not redirected automatically, <a href="/login">click here</a>.</p>
+</div>
+<script>
+    window.location.replace("/login");
+</script>
+{% endblock %}

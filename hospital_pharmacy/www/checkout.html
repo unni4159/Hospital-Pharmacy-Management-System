@@ -68,20 +68,82 @@
                 <label class="form-label">Phone Number</label>
 
                 <input
-                    type="text"
+                    type="tel"
                     id="phone_number"
                     class="form-control"
                     placeholder="Enter Phone Number"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    pattern="[0-9]{10}"
+                    minlength="10"
+                    maxlength="10"
+                    oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
+                    required>
+            </div>
+
+            <div class="mb-3">
+                <label for="delivery_date" class="form-label">Delivery Date</label>
+                <input
+                    type="date"
+                    id="delivery_date"
+                    class="form-control"
                     required>
             </div>
 
             <button
+                id="place_order_button"
                 class="btn btn-success"
                 onclick="place_order()">
 
                 Place Order
 
             </button>
+
+            <div id="checkout_error" class="alert alert-danger mt-3 d-none" role="alert"></div>
+
+            <div id="payment_section" class="card border-success mt-3" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title">Payment</h5>
+                    <p class="text-muted">Confirm payment details to place your order.</p>
+
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label">Payment Method</label>
+                        <select id="payment_method" class="form-select" onchange="update_payment_fields()">
+                            <option value="">Select a payment method</option>
+                            {% for mode in payment_modes %}
+                                <option value="{{ mode.name }}" data-type="{{ mode.type }}">{{ mode.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div id="payment_reference_section" class="border rounded p-3 mb-3 d-none">
+                        <h6>Reference Details</h6>
+                        <div class="mb-3">
+                            <label for="reference_no" class="form-label">Reference No</label>
+                            <input
+                                type="text"
+                                id="reference_no"
+                                class="form-control"
+                                placeholder="Enter reference number">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reference_date" class="form-label">Reference Date</label>
+                            <input
+                                type="date"
+                                id="reference_date"
+                                class="form-control">
+                        </div>
+                        <div class="form-text">Reference No and Reference Date are required for this payment method.</div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="confirm_payment()">
+                        Confirm Payment &amp; Place Order
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="hide_payment_section()">
+                        Back
+                    </button>
+                </div>
+            </div>
 
         </div>
 
@@ -101,13 +163,92 @@
 
 function place_order() {
 
-    let address = $("#delivery_address").val();
-    let phone = $("#phone_number").val();
+    let address = document.getElementById("delivery_address").value.trim();
+    let phone = document.getElementById("phone_number").value.trim();
+    let delivery_date = document.getElementById("delivery_date").value;
 
-    if(address == "" || phone == ""){
-        frappe.msgprint("Please enter delivery address and phone number.");
+    if(address === "" || phone === "" || delivery_date === ""){
+        show_checkout_error("Please enter delivery address, phone number, and delivery date before continuing to payment.");
         return;
     }
+
+    if (!is_valid_phone_number(phone)) {
+        show_checkout_error("Phone number must contain exactly 10 digits.");
+        document.getElementById("phone_number").focus();
+        return;
+    }
+
+    hide_checkout_error();
+    document.getElementById("payment_section").style.display = "block";
+    document.getElementById("place_order_button").style.display = "none";
+    document.getElementById("payment_method").focus();
+}
+
+function hide_payment_section() {
+    document.getElementById("payment_section").style.display = "none";
+    document.getElementById("place_order_button").style.display = "inline-block";
+}
+
+function confirm_payment() {
+    let address = document.getElementById("delivery_address").value.trim();
+    let phone = document.getElementById("phone_number").value.trim();
+    let delivery_date = document.getElementById("delivery_date").value;
+    let payment_method = document.getElementById("payment_method").value;
+
+    if (!is_valid_phone_number(phone)) {
+        show_checkout_error("Phone number must contain exactly 10 digits.");
+        document.getElementById("phone_number").focus();
+        return;
+    }
+
+    if (!payment_method) {
+        show_checkout_error("Please select a payment method.");
+        return;
+    }
+
+    if (!delivery_date) {
+        show_checkout_error("Please select a delivery date.");
+        document.getElementById("delivery_date").focus();
+        return;
+    }
+
+    const reference_no = document.getElementById("reference_no").value.trim();
+    const reference_date = document.getElementById("reference_date").value;
+    const requires_reference = paymentModeTypes[payment_method] === "Bank";
+
+    if (requires_reference) {
+        if (!reference_no) {
+            show_checkout_error("Reference No is required for this payment method.");
+            document.getElementById("reference_no").focus();
+            return;
+        }
+        if (!reference_date) {
+            show_checkout_error("Reference Date is required for this payment method.");
+            document.getElementById("reference_date").focus();
+            return;
+        }
+    }
+
+    hide_checkout_error();
+    submit_order(address, phone, payment_method, delivery_date, reference_no, reference_date);
+}
+
+function is_valid_phone_number(phone) {
+    return /^\d{10}$/.test(phone);
+}
+
+function update_payment_fields() {
+    let payment_method = document.getElementById("payment_method").value;
+    let section = document.getElementById("payment_reference_section");
+
+    if (paymentModeTypes[payment_method] === "Bank") {
+        section.classList.remove("d-none");
+    } else {
+        section.classList.add("d-none");
+    }
+}
+
+function submit_order(address, phone, payment_method, delivery_date, reference_no, reference_date) {
 
     frappe.call({
 
@@ -115,12 +256,19 @@ function place_order() {
 
         args: {
             delivery_address: address,
-            phone_number: phone
+            phone_number: phone,
+            payment_method: payment_method,
+            delivery_date: delivery_date,
+            reference_no: reference_no,
+            reference_date: reference_date
         },
+
+        freeze: true,
+        freeze_message: "Confirming payment and placing order...",
 
         callback: function(r){
 
-            if(!r.exc){
+            if(r.message && r.message.status === "success"){
 
                 frappe.msgprint("Order Created Successfully");
 
@@ -133,6 +281,22 @@ function place_order() {
     });
 
 }
+
+function show_checkout_error(message) {
+    let error_box = document.getElementById("checkout_error");
+    error_box.textContent = message;
+    error_box.classList.remove("d-none");
+}
+
+function hide_checkout_error() {
+    document.getElementById("checkout_error").classList.add("d-none");
+}
+
+const paymentModeTypes = {
+    {% for mode in payment_modes %}
+        "{{ mode.name }}": "{{ mode.type }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+};
 
 </script>
 

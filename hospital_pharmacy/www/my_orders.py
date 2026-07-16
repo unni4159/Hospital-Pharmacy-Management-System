@@ -3,7 +3,9 @@ import frappe
 def get_context(context):
 
     if frappe.session.user == "Guest":
-        frappe.throw("Please login.")
+        frappe.local.response["type"] = "redirect"
+        frappe.local.response["location"] = "/login"
+        return
 
     customer = frappe.db.get_value(
         "Shopping Cart",

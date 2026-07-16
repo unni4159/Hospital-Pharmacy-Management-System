@@ -1,0 +1,75 @@
+<nav class="navbar navbar-expand-lg pharmacy-navbar sticky-top">
+    <div class="container">
+
+        <a class="navbar-brand pharmacy-brand" href="/home" aria-label="Hospital Pharmacy home">
+            <span class="pharmacy-brand-icon">🏥</span>
+            <span>Hospital Pharmacy</span>
+        </a>
+
+        <button class="navbar-toggler pharmacy-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center pharmacy-nav-links">
+                <li class="nav-item">
+                    <a class="nav-link pharmacy-nav-link" href="/home">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link pharmacy-nav-link" href="/medicines">Medicines</a>
+                </li>
+
+                {% if frappe.session.user not in ["Administrator", "Guest"] %}
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-nav-link" href="/cart_view">Cart</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-nav-link" href="/my_orders">My Orders</a>
+                    </li>
+                {% endif %}
+
+                {% set user_name = frappe.session.user
+                    if frappe.session.user == "Guest"
+                    else frappe.db.get_value("User", frappe.session.user, "full_name")
+                    or frappe.db.get_value("User", frappe.session.user, "first_name")
+                    or frappe.session.user %}
+
+                {% set force_guest = (force_guest if force_guest is defined else false) or (frappe.form_dict.get("logged_out") == "1") %}
+
+                {% if frappe.session.user == "Guest" or force_guest %}
+                    <li class="nav-item pharmacy-nav-separator"></li>
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-nav-link" href="/login">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-register-link" href="/register">Register</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item pharmacy-nav-separator"></li>
+                    {% if frappe.session.user == "Administrator" %}
+                        <li class="nav-item">
+                            <a class="nav-link pharmacy-admin-link" href="/app">Admin Desk</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <span class="pharmacy-user-chip" title="Signed in user">
+                            <span class="pharmacy-user-initial">{{ user_name[:1]|upper }}</span>
+                            <span>Hi, {{ user_name }}</span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-signout-link" href="/logout">Sign Out</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

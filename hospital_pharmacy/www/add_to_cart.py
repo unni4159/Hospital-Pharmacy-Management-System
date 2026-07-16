@@ -1,4 +1,6 @@
+# pyrefly: ignore [missing-import]
 import frappe
+# pyrefly: ignore [missing-import]
 from frappe.utils import today
 
 
@@ -9,6 +11,9 @@ def get_context(context):
         frappe.local.response["location"] = "/login"
         return
 
+    from hospital_pharmacy.api import sync_quotation_to_shopping_cart, sync_quotation_from_shopping_cart, get_customer
+    sync_quotation_to_shopping_cart(frappe.session.user)
+
     item_code = frappe.form_dict.get("item")
     quantity = int(frappe.form_dict.get("qty") or 1)
 
@@ -18,7 +23,7 @@ def get_context(context):
     item = frappe.get_doc("Item", item_code)
 
     # For now use the first customer (you can improve this later)
-    customer = frappe.db.get_value("Customer", {}, "name")
+    customer = get_customer(frappe.session.user)
 
     if not customer:
         frappe.throw("Please create a Customer first.")
@@ -68,6 +73,7 @@ def get_context(context):
     cart.total_amount = total
 
     cart.save(ignore_permissions=True)
+    sync_quotation_from_shopping_cart(cart)
     frappe.db.commit()
 
     # Redirect to cart view
