@@ -128,7 +128,23 @@ def get_context(context):
             "price_list_rate"
         ) or 0
 
+        # Check for Pricing Rule discount
+        discount_percentage = frappe.db.get_value(
+            "Pricing Rule",
+            {
+                "item_code": item.item_code,
+                "disable": 0,
+                "apply_on": "Item Code"
+            },
+            "discount_percentage"
+        ) or 0
+
         item.standard_rate = price
+        item.discount_percentage = discount_percentage
+        if discount_percentage:
+            item.discounted_rate = price * (1.0 - (discount_percentage / 100.0))
+        else:
+            item.discounted_rate = price
 
         # Get Available Stock
         stock = frappe.db.sql("""

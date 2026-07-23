@@ -63,12 +63,20 @@
                     </div>
 
                     <!-- Price layout standard selling vs mock MRP -->
-                    {% set mrp = (medicine.standard_rate * 1.25)|round(2) %}
-                    <div class="medicine-card-price-row">
-                        <span class="price-actual">₹{{ medicine.standard_rate }}</span>
-                        <span class="price-mrp">₹{{ mrp }}</span>
-                        <span class="price-discount">20% OFF</span>
-                    </div>
+                    {% if medicine.discount_percentage %}
+                        <div class="medicine-card-price-row">
+                            <span class="price-actual">₹{{ medicine.discounted_rate|round(2) }}</span>
+                            <span class="price-mrp">₹{{ medicine.standard_rate|round(2) }}</span>
+                            <span class="price-discount">{{ medicine.discount_percentage|int }}% OFF</span>
+                        </div>
+                    {% else %}
+                        {% set mrp = (medicine.standard_rate * 1.25)|round(2) %}
+                        <div class="medicine-card-price-row">
+                            <span class="price-actual">₹{{ medicine.standard_rate }}</span>
+                            <span class="price-mrp">₹{{ mrp }}</span>
+                            <span class="price-discount">20% OFF</span>
+                        </div>
+                    {% endif %}
 
                     <div class="d-grid mt-auto gap-2">
                         {% if medicine.available_stock > 0 %}

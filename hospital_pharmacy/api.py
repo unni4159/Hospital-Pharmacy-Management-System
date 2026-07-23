@@ -65,6 +65,23 @@ def get_customer(user=None):
         customer = frappe.db.get_value("Customer", {"email_id": user}, "name")
     return customer
 
+def get_pricing_rule_rate(item_code, original_rate):
+    """Retrieve the discount percentage and calculate the discounted rate."""
+    discount_percentage = frappe.db.get_value(
+        "Pricing Rule",
+        {
+            "item_code": item_code,
+            "disable": 0,
+            "apply_on": "Item Code"
+        },
+        "discount_percentage"
+    ) or 0
+    
+    if discount_percentage:
+        discounted_rate = original_rate * (1.0 - (discount_percentage / 100.0))
+        return discounted_rate, discount_percentage
+    return original_rate, 0
+
 def get_active_quotation(customer, create_if_missing=False):
     if not customer:
         return None
@@ -188,6 +205,14 @@ def sync_quotation_from_shopping_cart(cart):
     quotation.set("items", [])
     for item in cart.cart_items:
         stock_uom = frappe.db.get_value("Item", item.item, "stock_uom")
+        base_rate = frappe.db.get_value(
+            "Item Price",
+            {"item_code": item.item, "price_list": "Standard Selling"},
+            "price_list_rate"
+        ) or item.rate
+        
+        discounted_rate, discount_percentage = get_pricing_rule_rate(item.item, base_rate)
+        
         quotation.append("items", {
             "item_code": item.item,
             "qty": item.quantity,
@@ -195,7 +220,9 @@ def sync_quotation_from_shopping_cart(cart):
             "uom": stock_uom,
             "stock_uom": stock_uom,
             "conversion_factor": 1.0,
-            "rate": item.rate
+            "price_list_rate": base_rate,
+            "discount_percentage": discount_percentage,
+            "rate": discounted_rate
         })
     quotation.flags.ignore_validate = True
     quotation.flags.ignore_mandatory = True
@@ -310,6 +337,8 @@ def add_to_cart(item_code, qty=1):
     if not rate:
         frappe.throw(f"Standard Selling Price not found for {item.item_name}")
 
+    discounted_rate, discount_percentage = get_pricing_rule_rate(item_code, rate)
+
     customer = get_customer(frappe.session.user)
     if not customer:
         frappe.throw("No Customer found.")
@@ -329,7 +358,9 @@ def add_to_cart(item_code, qty=1):
     stock_uom = frappe.db.get_value("Item", item.name, "stock_uom")
     if quotation_item:
         quotation_item.qty = new_qty
-        quotation_item.rate = rate
+        quotation_item.price_list_rate = rate
+        quotation_item.discount_percentage = discount_percentage
+        quotation_item.rate = discounted_rate
         quotation_item.stock_qty = new_qty * (quotation_item.conversion_factor or 1.0)
         quotation_item.uom = quotation_item.uom or stock_uom
         quotation_item.stock_uom = quotation_item.stock_uom or stock_uom
@@ -341,7 +372,9 @@ def add_to_cart(item_code, qty=1):
             "uom": stock_uom,
             "stock_uom": stock_uom,
             "conversion_factor": 1.0,
-            "rate": rate,
+            "price_list_rate": rate,
+            "discount_percentage": discount_percentage,
+            "rate": discounted_rate,
         })
 
     # Required quotation flow: update Quotation Item totals and then calculate
@@ -429,6 +462,22 @@ def update_cart(item_code, qty):
     # The quotation is the source of truth: update its Quotation Item, then
     # recalculate all item, tax, and grand-total values before saving.
     quotation_item.qty = qty
+    
+    base_rate = frappe.db.get_value(
+        "Item Price",
+        {
+            "item_code": item_code,
+            "price_list": "Standard Selling"
+        },
+        "price_list_rate"
+    ) or quotation_item.price_list_rate or quotation_item.rate
+    
+    if base_rate:
+        discounted_rate, discount_percentage = get_pricing_rule_rate(item_code, base_rate)
+        quotation_item.price_list_rate = base_rate
+        quotation_item.discount_percentage = discount_percentage
+        quotation_item.rate = discounted_rate
+
     quotation.calculate_taxes_and_totals()
     quotation.save(ignore_permissions=True)
 
@@ -1037,7 +1086,7 @@ def search_track_order(search_query):
     invoice = frappe.get_doc("Sales Invoice", delivery_order.sales_invoice)
     items = []
     for item in invoice.items:
-        image = frappe.db.get_value("Medicine", {"item_code": item.item_code}, "image") or "/assets/hospital_pharmacy/images/medicine_placeholder.png"
+        image = frappe.db.get_value("Item", item.item_code, "image") or "/assets/hospital_pharmacy/images/medicine_placeholder.png"
         items.append({
             "item_code": item.item_code,
             "item_name": item.item_name or item.item_code,
@@ -1045,8 +1094,8 @@ def search_track_order(search_query):
             "rate": item.rate,
             "amount": item.amount,
             "image": image,
-            "discount": item.discount_percentage or 0,
-            "tax": item.tax_amount or 0
+            "discount": item.get("discount_percentage") or 0,
+            "tax": item.get("tax_amount") or 0
         })
 
     # Fetch billing address display
@@ -1076,7 +1125,7 @@ def search_track_order(search_query):
         "billing_address": billing_address,
         "delivery_address": delivery_order.delivery_address,
         "payment_status": invoice.status or "Unpaid",
-        "payment_method": invoice.payment_method or "Credit Card",
+        "payment_method": invoice.get("payment_method") or invoice.get("mode_of_payment") or "Credit Card",
         "posting_date": invoice.posting_date,
         "grand_total": invoice.grand_total,
         "items": items

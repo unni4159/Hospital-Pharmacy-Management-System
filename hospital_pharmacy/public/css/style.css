@@ -457,6 +457,31 @@ body {
     color: #ffffff !important;
 }
 
+.btn-teal {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25) !important;
+}
+
+.btn-teal:hover {
+    background: linear-gradient(135deg, var(--primary-hover), var(--primary-hover)) !important;
+    box-shadow: 0 6px 20px rgba(13, 148, 136, 0.35) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-teal {
+    color: var(--primary-color) !important;
+    border: 1.5px solid var(--primary-color) !important;
+    background: transparent !important;
+}
+
+.btn-outline-teal:hover {
+    background: var(--primary-light) !important;
+    color: var(--primary-hover) !important;
+    transform: translateY(-2px);
+}
+
 /* Amazon style warning/gold button */
 .btn-warning, .btn-action-gold {
     background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)) !important;

@@ -276,6 +276,181 @@
     right: 20px;
     z-index: 1100;
 }
+
+/* Amazon-style vertical progress tracker */
+.amazon-tracker-wrapper {
+    margin: 30px 0;
+    padding: 10px;
+}
+
+.amazon-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding-left: 0;
+}
+
+.timeline-vertical-line {
+    position: absolute;
+    left: 23px;
+    top: 12px;
+    bottom: 12px;
+    width: 4px;
+    background-color: #cbd5e1;
+    z-index: 1;
+    border-radius: 2px;
+}
+
+.timeline-vertical-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #0d9488; /* Premium Teal */
+    z-index: 2;
+    height: 0%;
+    transition: height 0.8s ease;
+    border-radius: 2px;
+}
+
+.amazon-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+    z-index: 3;
+}
+
+.amazon-step .step-icon-container {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border-radius: 50%;
+    margin-left: 13px;
+    position: relative;
+    z-index: 4;
+}
+
+.amazon-step.upcoming .step-icon {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #cbd5e1;
+    background-color: #ffffff;
+    border-radius: 2px; /* Square outline like Amazon */
+}
+
+.amazon-step.active .step-icon {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #0d9488;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2);
+    animation: pulse-teal 2s infinite;
+}
+
+.amazon-step.completed .step-icon {
+    width: 24px;
+    height: 24px;
+    background-color: #0d9488;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+}
+
+.amazon-step.completed .step-icon::before {
+    content: "✓";
+    font-weight: 900;
+}
+
+.amazon-step .step-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.amazon-step .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #475569;
+    transition: color 0.3s ease;
+}
+
+.amazon-step.completed .step-title,
+.amazon-step.active .step-title {
+    color: #0f172a;
+}
+
+.amazon-step .step-date {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.amazon-step .see-all-updates-link {
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+.amazon-step .see-all-updates-link a {
+    color: #0d9488;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.amazon-step .see-all-updates-link a:hover {
+    text-decoration: underline;
+}
+
+/* Dark mode overrides for timeline */
+.dark-mode-override .timeline-vertical-line {
+    background-color: #334155;
+}
+
+.dark-mode-override .amazon-step .step-icon-container {
+    background-color: #1e293b;
+}
+
+.dark-mode-override .amazon-step.upcoming .step-icon {
+    border-color: #475569;
+    background-color: #1e293b;
+}
+
+.dark-mode-override .amazon-step.active .step-icon {
+    background-color: #1e293b;
+}
+
+.dark-mode-override .amazon-step .step-title {
+    color: #94a3b8;
+}
+
+.dark-mode-override .amazon-step.completed .step-title,
+.dark-mode-override .amazon-step.active .step-title {
+    color: #f8fafc;
+}
+
+.dark-mode-override .amazon-step .step-date {
+    color: #94a3b8;
+}
+
+@keyframes pulse-teal {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(13, 148, 136, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+    }
+}
 </style>
 
 <div class="order-tracking-dashboard py-5" id="mainDashboardWrapper">
@@ -329,6 +504,46 @@
                             </form>
                         </div>
 
+                        {% if orders %}
+                        <!-- Recent Trackable Orders Card -->
+                        <div class="card tracking-card p-4 mb-4" id="recentOrdersSection">
+                            <h5 class="fw-bold mb-3">📦 Your Trackable Orders</h5>
+                            <div class="table-responsive">
+                                <table class="table mb-0 align-middle">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <th class="ps-3" style="color: var(--text-primary) !important; font-weight: 700;">Invoice No</th>
+                                            <th style="color: var(--text-primary) !important; font-weight: 700;">Medicines</th>
+                                            <th class="text-end pe-3" style="color: var(--text-primary) !important; font-weight: 700;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                        <tr>
+                                            <td class="ps-3 fw-bold text-dark">{{ order.name }}</td>
+                                            <td>
+                                                <div class="d-flex flex-column gap-2">
+                                                    {% for item in order.order_items %}
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <img src="{{ item.image or '/assets/hospital_pharmacy/images/placeholder.png' }}" alt="{{ item.item_name }}" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
+                                                        <span class="small fw-bold text-slate-700" style="font-size: 13px;">{{ item.item_name }}</span>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <button class="btn btn-sm btn-teal px-3 py-1.5" onclick="quickTrackOrder('{{ order.name }}')">
+                                                    🚚 Track
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <!-- Skeleton Loader -->
                         <div id="skeletonLoader" class="d-none">
                             <div class="card tracking-card p-4 mb-4">
@@ -356,33 +571,64 @@
                                     </div>
                                 </div>
 
-                                <!-- Progress Tracker Workflow -->
-                                <div class="progress-tracker my-5">
-                                    <div class="progress-tracker-bar" id="progressBarFill" style="width: 0%;"></div>
-                                    
-                                    <div class="step-item" id="step-placed">
-                                        <div class="step-marker"></div>
-                                        <div class="step-label">Placed</div>
-                                    </div>
-                                    <div class="step-item" id="step-confirmed">
-                                        <div class="step-marker"></div>
-                                        <div class="step-label">Confirmed</div>
-                                    </div>
-                                    <div class="step-item" id="step-processing">
-                                        <div class="step-marker"></div>
-                                        <div class="step-label">Processing</div>
-                                    </div>
-                                    <div class="step-item" id="step-shipped">
-                                        <div class="step-marker"></div>
-                                        <div class="step-label">Shipped</div>
-                                    </div>
-                                    <div class="step-item" id="step-out">
-                                        <div class="step-marker"></div>
-                                        <div class="step-label">Out for Delivery</div>
-                                    </div>
-                                    <div class="step-item" id="step-delivered">
-                                        <div class="step-marker"></div>
-                                        <div class="step-label">Delivered</div>
+                                <!-- Amazon-Style Header Delivery Message -->
+                                <div class="mb-4">
+                                    <h3 class="fw-extrabold text-slate-800" id="lblDeliveryHeadline"></h3>
+                                </div>
+
+                                <!-- Amazon-Style Progress Tracker Workflow -->
+                                <div class="amazon-tracker-wrapper mb-5">
+                                    <div class="amazon-timeline">
+                                        <div class="timeline-vertical-line">
+                                            <div class="timeline-vertical-line-fill" id="timelineLineFill" style="height: 0%;"></div>
+                                        </div>
+                                        
+                                        <!-- Step 1: Ordered -->
+                                        <div class="amazon-step" id="step-ordered">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Ordered</span>
+                                                <span class="step-date" id="step-ordered-date"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2: Shipped -->
+                                        <div class="amazon-step" id="step-shipped">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Shipped</span>
+                                                <span class="step-date" id="step-shipped-date"></span>
+                                                <span class="see-all-updates-link d-none" id="see-all-updates">
+                                                    <a href="#timelineListContainer" onclick="scrollToHistory(event)">See all updates</a>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 3: Out for Delivery -->
+                                        <div class="amazon-step" id="step-out">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Out for delivery</span>
+                                                <span class="step-date" id="step-out-date"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 4: Delivered -->
+                                        <div class="amazon-step" id="step-delivered">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Delivered</span>
+                                                <span class="step-date" id="step-delivered-date"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -804,6 +1050,15 @@ function switchTab(tab) {
     }
 }
 
+// Quick track an order from the list
+function quickTrackOrder(orderId) {
+    const input = document.getElementById('orderSearchInput');
+    if (input) {
+        input.value = orderId;
+        performOrderLookup();
+    }
+}
+
 // Perform client-side order lookup
 function performOrderLookup(event) {
     if (event) event.preventDefault();
@@ -822,6 +1077,14 @@ function performOrderLookup(event) {
             if (r.message) {
                 activeOrder = r.message;
                 renderOrderTracking(r.message);
+                
+                // Scroll smoothly to results card
+                setTimeout(() => {
+                    const resultContainer = document.getElementById('trackResultContainer');
+                    if (resultContainer) {
+                        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
             }
         },
         error: function(err) {
@@ -829,6 +1092,35 @@ function performOrderLookup(event) {
             showToast("Failed to lookup order. Check your input and try again.", "danger");
         }
     });
+}
+
+// Date Formatter matching Amazon style
+function formatTimelineDate(dateStr) {
+    if (!dateStr) return "";
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const dayName = days[date.getDay()];
+        const day = date.getDate();
+        const monthName = months[date.getMonth()];
+        
+        return `${dayName}, ${day} ${monthName}`;
+    } catch (e) {
+        return dateStr;
+    }
+}
+
+// Scroll to Detailed History timeline
+function scrollToHistory(event) {
+    if (event) event.preventDefault();
+    const el = document.getElementById('timelineListContainer');
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 // Render Order Tracking View
@@ -842,7 +1134,7 @@ function renderOrderTracking(order) {
     const badge = document.getElementById('lblStatusBadge');
     badge.innerText = order.delivery_status;
     badge.className = "badge py-2 px-3 fs-6 rounded-pill ";
-    if (["Delivered", "Refunded"].includes(order.delivery_status)) {
+    if (["Delivered", "Refunded", "Returned"].includes(order.delivery_status)) {
         badge.className += "bg-success text-white";
     } else if (["Cancelled", "Delivery Failed"].includes(order.delivery_status)) {
         badge.className += "bg-danger text-white";
@@ -850,38 +1142,113 @@ function renderOrderTracking(order) {
         badge.className += "bg-teal text-white";
     }
 
-    // Map status to progress bar width & steps
-    const statusMap = {
-        "Order Placed": { pct: 5, step: 0 },
-        "Order Confirmed": { pct: 20, step: 1 },
-        "Processing": { pct: 40, step: 2 },
-        "Packed": { pct: 40, step: 2 },
-        "Ready to Ship": { pct: 60, step: 3 },
-        "Shipped": { pct: 60, step: 3 },
-        "In Transit": { pct: 60, step: 3 },
-        "Arrived at Local Hub": { pct: 60, step: 3 },
-        "Out for Delivery": { pct: 80, step: 4 },
-        "Delivered": { pct: 100, step: 5 }
-    };
+    // Map status to Amazon vertical steps
+    // 0: Ordered, 1: Shipped, 2: Out for Delivery, 3: Delivered
+    let activeStepIndex = 0;
+    const status = order.delivery_status;
+    
+    if (["Delivered", "Refunded", "Returned"].includes(status)) {
+        activeStepIndex = 3;
+    } else if (status === "Out for Delivery") {
+        activeStepIndex = 2;
+    } else if (["Packed", "Ready to Ship", "Shipped", "In Transit", "Arrived at Local Hub", "Reached Local Hub"].includes(status)) {
+        activeStepIndex = 1;
+    } else {
+        activeStepIndex = 0;
+    }
 
-    const statusConfig = statusMap[order.delivery_status] || { pct: 0, step: -1 };
-    document.getElementById('progressBarFill').style.width = `${statusConfig.pct}%`;
+    // Set vertical fill line height
+    const heights = ["0%", "33%", "66%", "100%"];
+    const fillLine = document.getElementById('timelineLineFill');
+    if (fillLine) {
+        fillLine.style.height = heights[activeStepIndex];
+    }
 
-    // Step items highlight
-    const steps = ["step-placed", "step-confirmed", "step-processing", "step-shipped", "step-out", "step-delivered"];
-    steps.forEach((stepId, index) => {
+    // Highlight step classes
+    const stepIds = ["step-ordered", "step-shipped", "step-out", "step-delivered"];
+    stepIds.forEach((stepId, index) => {
         const el = document.getElementById(stepId);
-        if (index < statusConfig.step) {
-            el.className = "step-item completed";
-        } else if (index === statusConfig.step) {
-            el.className = "step-item active";
-        } else {
-            el.className = "step-item";
+        if (el) {
+            if (index < activeStepIndex) {
+                el.className = "amazon-step completed";
+            } else if (index === activeStepIndex) {
+                el.className = "amazon-step active";
+            } else {
+                el.className = "amazon-step upcoming";
+            }
         }
     });
 
-    // Animate map truck along path
-    animateTruck(statusConfig.pct / 100.0);
+    // Populate timeline dates from tracking history
+    const orderedTimeline = order.tracking_timeline.find(t => 
+        ["Order Placed", "Pending", "Order Confirmed", "Confirmed", "Processing", "Approved"].includes(t.status)
+    );
+    const shippedTimeline = order.tracking_timeline.find(t => 
+        ["Packed", "Ready to Ship", "Shipped", "In Transit", "Arrived at Local Hub", "Reached Local Hub"].includes(t.status)
+    );
+    const outTimeline = order.tracking_timeline.find(t => 
+        ["Out for Delivery"].includes(t.status)
+    );
+    const deliveredTimeline = order.tracking_timeline.find(t => 
+        ["Delivered", "Refunded", "Returned", "Cancelled", "Delivery Failed"].includes(t.status)
+    );
+
+    const orderedDateStr = orderedTimeline ? formatTimelineDate(orderedTimeline.date) : "";
+    const shippedDateStr = shippedTimeline ? formatTimelineDate(shippedTimeline.date) : "";
+    const outDateStr = outTimeline ? formatTimelineDate(outTimeline.date) : "";
+    const deliveredDateStr = deliveredTimeline ? formatTimelineDate(deliveredTimeline.date) : "";
+
+    document.getElementById('step-ordered-date').innerText = orderedDateStr;
+    document.getElementById('step-shipped-date').innerText = shippedDateStr;
+    document.getElementById('step-out-date').innerText = outDateStr;
+    
+    // For delivered date: if not delivered yet, show the expected delivery date!
+    const deliveredLabel = document.getElementById('step-delivered-date');
+    if (deliveredDateStr) {
+        deliveredLabel.innerText = deliveredDateStr;
+    } else if (order.expected_delivery_date) {
+        deliveredLabel.innerText = "Arriving " + formatTimelineDate(order.expected_delivery_date);
+    } else {
+        deliveredLabel.innerText = "Pending delivery";
+    }
+
+    // Toggle "See all updates" link under active step
+    const seeAllUpdates = document.getElementById('see-all-updates');
+    if (seeAllUpdates) {
+        if (activeStepIndex >= 1 && activeStepIndex < 3) {
+            seeAllUpdates.classList.remove('d-none');
+        } else {
+            seeAllUpdates.classList.add('d-none');
+        }
+    }
+
+    // Set Amazon-style delivery message header text
+    const headline = document.getElementById('lblDeliveryHeadline');
+    if (headline) {
+        headline.className = "fw-extrabold text-slate-800 mb-0";
+        if (status === "Delivered") {
+            headline.innerText = "Delivered " + (deliveredDateStr || formatTimelineDate(order.expected_delivery_date) || "");
+        } else if (status === "Out for Delivery") {
+            headline.innerText = "Arriving today by 9 PM";
+        } else if (status === "Cancelled") {
+            headline.innerText = "Cancelled";
+            headline.className = "fw-extrabold text-danger mb-0";
+        } else if (status === "Returned") {
+            headline.innerText = "Returned";
+            headline.className = "fw-extrabold text-warning mb-0";
+        } else if (status === "Refunded") {
+            headline.innerText = "Refunded";
+            headline.className = "fw-extrabold text-success mb-0";
+        } else if (order.expected_delivery_date) {
+            headline.innerText = "Arriving " + formatTimelineDate(order.expected_delivery_date);
+        } else {
+            headline.innerText = "Order Placed";
+        }
+    }
+
+    // Map truck animation
+    const fractionMap = [0.1, 0.45, 0.8, 1.0];
+    animateTruck(fractionMap[activeStepIndex]);
     document.getElementById('lblDistanceRemaining').innerText = order.distance_remaining;
 
     // Dates & Stats
@@ -1241,6 +1608,22 @@ document.addEventListener('DOMContentLoaded', function() {
             wrapper.classList.add('dark-mode-override');
         }
     } catch(e) {}
+
+    // Automatically perform lookup if query is present in URL or context
+    const urlParams = new URLSearchParams(window.location.search);
+    let query = urlParams.get('search_query') || urlParams.get('invoice') || urlParams.get('order_id') || urlParams.get('id');
+    
+    if (!query) {
+        query = "{{ default_order_id or '' }}";
+    }
+
+    if (query && query.trim() !== "") {
+        const searchInput = document.getElementById('orderSearchInput');
+        if (searchInput) {
+            searchInput.value = query;
+            performOrderLookup();
+        }
+    }
 });
 </script>
 

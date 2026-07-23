@@ -19,16 +19,27 @@
                 <thead>
                     <tr>
                         <th>Invoice No</th>
+                        <th>Medicines</th>
                         <th>Order Date</th>
                         <th>Total Amount</th>
                         <th>Status</th>
-                        <th width="140" class="text-center">Action</th>
+                        <th width="240" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in orders %}
                     <tr>
                         <td class="fw-bold text-dark">{{ order.name }}</td>
+                        <td>
+                            <div class="d-flex flex-column gap-2">
+                                {% for item in order.order_items %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="{{ item.image or '/assets/hospital_pharmacy/images/placeholder.png' }}" alt="{{ item.item_name }}" style="width: 36px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color);">
+                                    <span class="small fw-bold text-slate-700" style="font-size: 13px;">{{ item.item_name }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
                         <td>{{ order.posting_date }}</td>
                         <td class="fw-bold text-teal" style="color: var(--primary-color);">₹{{ order.grand_total }}</td>
                         <td>
@@ -39,10 +50,16 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            <a href="/order_details?invoice={{ order.name }}"
-                               class="btn btn-sm btn-outline-primary py-1 px-3">
-                                View Details
-                            </a>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a href="/order_details?invoice={{ order.name }}"
+                                   class="btn btn-sm btn-outline-primary py-1 px-3">
+                                    View Details
+                                </a>
+                                <a href="/order_tracking?search_query={{ order.name }}"
+                                   class="btn btn-sm btn-outline-teal py-1 px-3">
+                                    🚚 Track
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
