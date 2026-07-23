@@ -1,25 +1,16 @@
+# pyrefly: ignore [missing-import]
 import frappe
 
 
 def get_context(context):
     user = frappe.session.user
 
-    if user == "Guest":
-        frappe.local.response["type"] = "redirect"
-        frappe.local.response["location"] = "/login"
-        return
-
-    roles = frappe.get_roles(user)
-    filters = {
-        "docstatus": 1
-    }
-
-    if "Administrator" not in roles:
-        filters["owner"] = user
-
     context.orders = frappe.get_all(
         "Sales Invoice",
-        filters=filters,
+        filters={
+            "owner": user,
+            "docstatus": 1
+        },
         fields=[
             "name",
             "posting_date",

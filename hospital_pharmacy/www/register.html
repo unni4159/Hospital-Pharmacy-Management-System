@@ -4,97 +4,154 @@
 
 {% include "hospital_pharmacy/templates/navbar.html" %}
 
-<div class="container d-flex align-items-center justify-content-center my-5" style="min-height: 80vh;">
+<div class="container d-flex align-items-center justify-content-center my-5" style="min-height: 80vh; padding: 40px 20px;">
 
-    <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="max-width: 520px; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+    <div class="card border-0 shadow-premium rounded-4 overflow-hidden" style="max-width: 520px; width: 100%; background: #ffffff;">
         
-        <!-- Premium Accent Header -->
-        <div class="p-5 text-center text-white" style="background: linear-gradient(135deg, #0d6efd, #0056b3);">
-            <h2 class="fw-bold mb-1">Create Account</h2>
-            <p class="mb-0 opacity-75">Sign up to get your medical orders delivered quickly</p>
+        <!-- Elegant Header -->
+        <div class="p-5 text-center text-white" style="background: linear-gradient(135deg, #0d9488, #0f766e); position: relative;">
+            <div class="mb-3" style="font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));">🏥</div>
+            <h2 class="fw-bold mb-1" style="font-size: 26px; letter-spacing: -0.02em;">Create Account</h2>
+            <p class="mb-0 text-white-50 small">Sign up to get your medical orders delivered quickly</p>
         </div>
 
         <div class="card-body p-5">
-            <div id="register-alert" class="alert alert-danger d-none" role="alert"></div>
-            <div id="register-success" class="alert alert-success d-none" role="alert"></div>
+            <div id="register-alert" class="alert alert-danger d-none rounded-3 small" role="alert"></div>
+            <div id="register-success" class="alert alert-success d-none rounded-3 small" role="alert"></div>
 
             <form id="register-form" onsubmit="event.preventDefault(); register_customer();">
                 <div class="mb-4">
-                    <label class="form-label text-secondary fw-semibold">Full Name</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
-                        <input type="text" id="customer_name" class="form-control bg-light border-start-0 py-2.5" placeholder="John Doe" required>
+                    <label class="form-label text-secondary fw-semibold small mb-2">Full Name</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-person"></i></span>
+                        <input type="text" id="customer_name" class="premium-input" placeholder="John Doe" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label text-secondary fw-semibold">Email Address</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
-                        <input type="email" id="email" class="form-control bg-light border-start-0 py-2.5" placeholder="john@example.com" required>
+                    <label class="form-label text-secondary fw-semibold small mb-2">Email Address</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-envelope"></i></span>
+                        <input type="email" id="email" class="premium-input" placeholder="john@example.com" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label text-secondary fw-semibold">Mobile Number</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
-                        <input type="tel" id="mobile" class="form-control bg-light border-start-0 py-2.5" placeholder="+1234567890">
+                    <label class="form-label text-secondary fw-semibold small mb-2">Mobile Number</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-telephone"></i></span>
+                        <input type="tel" id="mobile" class="premium-input" placeholder="+1234567890">
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label text-secondary fw-semibold">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                        <input type="password" id="password" class="form-control bg-light border-start-0 py-2.5" placeholder="••••••••" required>
+                    <label class="form-label text-secondary fw-semibold small mb-2">Password</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="password" class="premium-input" placeholder="••••••••" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label text-secondary fw-semibold">Confirm Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-check2-circle text-muted"></i></span>
-                        <input type="password" id="confirm_password" class="form-control bg-light border-start-0 py-2.5" placeholder="••••••••" required>
+                    <label class="form-label text-secondary fw-semibold small mb-2">Confirm Password</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-check2-circle"></i></span>
+                        <input type="password" id="confirm_password" class="premium-input" placeholder="••••••••" required>
                     </div>
                 </div>
 
                 <div class="d-grid gap-2 mt-4">
-                    <button type="submit" id="btn-register" class="btn btn-primary btn-lg rounded-3 py-3 fw-bold transition-all" style="background: linear-gradient(135deg, #0d6efd, #0056b3); border: none; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.25);">
+                    <button type="submit" id="btn-register" class="btn-premium-action">
                         Register Account
                     </button>
                 </div>
             </form>
 
-            <div class="text-center mt-4">
-                <p class="text-muted mb-0">Already have an account? <a href="/login?redirect-to={{ redirect_to|urlencode }}" class="text-decoration-none fw-bold text-primary">Sign In</a></p>
+            <div class="text-center mt-4 pt-2">
+                <p class="text-muted mb-0 small">Already have an account? <a href="/login?redirect-to={{ redirect_to|urlencode }}" class="text-decoration-none fw-bold text-teal">Sign In</a></p>
             </div>
         </div>
     </div>
 
 </div>
 
-<!-- Styles for smooth interactions -->
+<!-- Styles for premium layout -->
 <style>
-    .transition-all {
+    .shadow-premium {
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    }
+    
+    .premium-input-group {
+        display: flex;
+        align-items: center;
+        background: #f8fafc !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 50px !important;
+        padding: 2px 18px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .transition-all:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35) !important;
+
+    .premium-input-group:focus-within {
+        border-color: #0d9488 !important;
+        box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1) !important;
+        background: #ffffff !important;
     }
-    .transition-all:active {
+
+    .premium-input-icon {
+        font-size: 16px;
+        color: #64748b;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+    }
+
+    .premium-input {
+        flex: 1;
+        border: none !important;
+        background: transparent !important;
+        padding: 10px 0 !important;
+        outline: none !important;
+        font-size: 14px !important;
+        color: #0f172a !important;
+    }
+    
+    .premium-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .btn-premium-action {
+        background: linear-gradient(135deg, #0d9488, #0f766e) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 50px !important;
+        padding: 14px 24px !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        letter-spacing: -0.01em;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3) !important;
+    }
+
+    .btn-premium-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4) !important;
+    }
+
+    .btn-premium-action:active {
         transform: translateY(1px);
     }
-    .input-group-text {
-        border-color: #dee2e6;
+    
+    .text-teal {
+        color: #0d9488 !important;
+        transition: color 0.2s ease;
     }
-    .form-control:focus {
-        box-shadow: none;
-        border-color: #0d6efd;
-    }
-    .form-control:focus + .input-group-text {
-        border-color: #0d6efd;
+    
+    .text-teal:hover {
+        color: #0f766e !important;
     }
 </style>
 
@@ -121,7 +178,18 @@ function register_customer() {
         return;
     }
 
-    registerBtn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating Account...');
+    // Validate Gmail requirements
+    const gmailErr = validateGmailAddress(email);
+    if (gmailErr) {
+        alertBox.html(gmailErr).removeClass("d-none");
+        return;
+    }
+
+    if (typeof validatePasswordRequirements === 'function') {
+        const pwdErr = validatePasswordRequirements(password, email);
+        if (pwdErr) {
+            alertBox.html(pwdErr).removeClass("d-none");
+      registerBtn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 8px;"></span> Creating Account...');
 
     frappe.call({
         method: "hospital_pharmacy.api.register_portal_user",
@@ -154,6 +222,41 @@ function register_customer() {
             alertBox.html(msg).removeClass("d-none");
         }
     });
+}
+
+function validateGmailAddress(email) {
+    if (!email) return "Email address is required.";
+    email = email.trim();
+    
+    // Check if it ends with @gmail.com
+    const gmailSuffix = "@gmail.com";
+    if (!email.toLowerCase().endsWith(gmailSuffix)) {
+        return "Email address must end with @gmail.com.";
+    }
+    
+    // Extract username
+    const username = email.substring(0, email.length - gmailSuffix.length);
+    if (!username) {
+        return "Gmail username cannot be empty.";
+    }
+    
+    // Check allowed characters
+    const allowedChars = /^[a-zA-Z0-9\.]+$/;
+    if (!allowedChars.test(username)) {
+        return "Gmail username can only contain letters (a-z, A-Z), numbers (0-9), and periods (.).";
+    }
+    
+    // Start or end with period
+    if (username.startsWith('.') || username.endsWith('.')) {
+        return "Gmail username cannot start or end with a period (.).";
+    }
+    
+    // Consecutive periods
+    if (username.includes('..')) {
+        return "Gmail username cannot contain consecutive periods (..).";
+    }
+    
+    return null;
 }
 </script>
 

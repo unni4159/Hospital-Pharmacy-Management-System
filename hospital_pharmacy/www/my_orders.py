@@ -1,11 +1,12 @@
+# pyrefly: ignore [missing-import]
 import frappe
+
+no_cache = 1
 
 def get_context(context):
 
     if frappe.session.user == "Guest":
-        frappe.local.response["type"] = "redirect"
-        frappe.local.response["location"] = "/login"
-        return
+        frappe.throw("Please login.")
 
     customer = frappe.db.get_value(
         "Shopping Cart",

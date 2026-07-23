@@ -33,6 +33,8 @@ def get_context(context):
         return
 
     context.cart = frappe.get_doc("Shopping Cart", cart_name)
+    for row in context.cart.cart_items:
+        row.item_name = frappe.db.get_value("Item", row.item, "item_name") or row.item
     context.payment_modes = frappe.get_all(
         "Mode of Payment",
         filters={"enabled": 1},

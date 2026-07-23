@@ -6,58 +6,99 @@
 
 <div class="container mt-5">
 
-    <h2 class="mb-4">📦 My Orders</h2>
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-dark mb-1">📦 My Purchase History</h2>
+        <p class="text-muted">Track order status and download pharmacy invoice receipts</p>
+    </div>
 
     {% if orders %}
 
-    <table class="table table-bordered table-striped">
-
-        <thead class="table-dark">
-            <tr>
-                <th>Invoice No</th>
-                <th>Order Date</th>
-                <th>Total Amount</th>
-                <th>Status</th>
-                <th>View</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-        {% for order in orders %}
-
-        <tr>
-            <td>{{ order.name }}</td>
-            <td>{{ order.posting_date }}</td>
-            <td>₹ {{ order.grand_total }}</td>
-            <td>{{ order.status }}</td>
-            <td>
-                <a href="/order_details?invoice={{ order.name }}"
-                   class="btn btn-sm btn-primary">
-                    View Details
-                </a>
-            </td>
-        </tr>
-
-        {% endfor %}
-
-        </tbody>
-
-    </table>
+    <div class="card border-0 shadow-sm overflow-hidden mb-5">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Order Date</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th width="140" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ order.name }}</td>
+                        <td>{{ order.posting_date }}</td>
+                        <td class="fw-bold text-teal" style="color: var(--primary-color);">₹{{ order.grand_total }}</td>
+                        <td>
+                            {% if order.status == "Paid" %}
+                                <span class="badge bg-success text-white">Paid</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ order.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="/order_details?invoice={{ order.name }}"
+                               class="btn btn-sm btn-outline-primary py-1 px-3">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     {% else %}
 
-    <div class="alert alert-info">
-        <h5>No Orders Found</h5>
-        <p>You haven't placed any orders yet.</p>
-
-        <a href="/medicines" class="btn btn-primary">
-            Browse Medicines
-        </a>
+    <div class="card border-0 shadow-md p-5 text-center my-4">
+        <div class="fs-1 mb-3">📦</div>
+        <h4 class="fw-bold text-dark">No orders found</h4>
+        <p class="text-muted mb-4">You have not placed any pharmaceutical orders with us yet.</p>
+        <div>
+            <a href="/medicines" class="btn btn-warning px-4 py-2.5 rounded-3 fw-bold">
+                💊 Start Shopping
+            </a>
+        </div>
     </div>
 
     {% endif %}
 
 </div>
+
+<!-- ================= Footer Section ================= -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand pharmacy-brand mb-3" href="/home">
+                    <span class="pharmacy-brand-icon">🏥</span>
+                    <span>Hospital Pharmacy</span>
+                </a>
+                <p class="mt-2 text-muted-50">Providing smart, secure, and fast healthcare management solutions. Easily order medicines, view reports, and manage supplies online.</p>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Useful Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/home">Home</a></li>
+                    <li class="mb-2"><a href="/medicines">Browse Medicines</a></li>
+                    <li class="mb-2"><a href="/cart_view">Shopping Cart</a></li>
+                    <li class="mb-2"><a href="/my_orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Emergency Care</h5>
+                <p class="mb-2">📞 Helpline: +91 1800-456-7890</p>
+                <p class="mb-2">✉️ Email: support@hospitalpharmacy.com</p>
+                <p>📍 Location: Block-B, City General Hospital Complex</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0">&copy; 2026 Hospital Pharmacy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
 {% endblock %}

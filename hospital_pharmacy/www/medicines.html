@@ -6,257 +6,131 @@
 
 <div class="container mt-5">
 
-    <h1 class="text-center mb-4">💊 Available Medicines</h1>
+    <div class="text-center mb-4">
+        <h1 class="fw-bold text-dark mb-2">💊 Available Medicines</h1>
+        <p class="text-muted">Browse or search our authentic pharmaceutical inventory</p>
+    </div>
 
-    <!-- Custom Style to Bypass Caching Issues and Provide Premium Design -->
-    <style>
-        .premium-search-container {
-            max-width: 800px;
-            margin: 0 auto 30px auto;
-            position: relative;
-        }
-        
-        .premium-search-bar {
-            display: flex;
-            align-items: center;
-            background: #ffffff;
-            border: 2px solid #e2e8f0;
-            border-radius: 50px;
-            padding: 6px 8px 6px 24px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .premium-search-bar:focus-within {
-            border-color: #0d6efd;
-            box-shadow: 0 10px 25px rgba(13, 110, 253, 0.15);
-            transform: translateY(-1px);
-        }
-        
-        .premium-search-icon {
-            color: #94a3b8;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            transition: color 0.3s ease;
-        }
-        
-        .premium-search-bar:focus-within .premium-search-icon {
-            color: #0d6efd;
-        }
-        
-        .premium-search-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 16px;
-            color: #1e293b;
-            padding: 10px 0;
-            font-family: inherit;
-        }
-        
-        .premium-search-input::placeholder {
-            color: #94a3b8;
-            transition: color 0.3s ease;
-        }
-
-        .premium-search-bar:focus-within .premium-search-input::placeholder {
-            color: #cbd5e1;
-        }
-        
-        .premium-search-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .premium-btn-search {
-            background: linear-gradient(135deg, #0d6efd, #0056b3);
-            color: #ffffff;
-            border: none;
-            border-radius: 40px;
-            padding: 10px 24px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
-        }
-        
-        .premium-btn-search:hover {
-            background: linear-gradient(135deg, #0b5ed7, #004085);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.25);
-            color: #ffffff;
-            text-decoration: none;
-        }
-        
-        .premium-btn-search:active {
-            transform: translateY(1px);
-        }
-        
-        .premium-btn-reset {
-            color: #64748b;
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 40px;
-            padding: 10px 20px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .premium-btn-reset:hover {
-            color: #ef4444;
-            background: #fef2f2;
-            border-color: #fee2e2;
-            text-decoration: none;
-            transform: translateY(-1px);
-        }
-        
-        .premium-btn-reset:active {
-            transform: translateY(1px);
-        }
-        
-        @media (max-width: 576px) {
-            .premium-search-bar {
-                padding: 6px 8px 6px 16px;
-            }
-            .premium-search-icon {
-                margin-right: 8px;
-            }
-            .premium-search-input {
-                font-size: 14px;
-            }
-            .premium-btn-search {
-                padding: 8px 16px;
-                font-size: 14px;
-            }
-            .premium-btn-reset {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-        }
-    </style>
-
-    <!-- Search Form -->
-    <div class="premium-search-container">
-        <form method="GET" action="/medicines">
-            <div class="premium-search-bar">
-                <div class="premium-search-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </div>
-
-                <input
-                    type="text"
-                    name="search"
-                    class="premium-search-input"
-                    placeholder="Search medicines..."
-                    value="{{ search or '' }}">
-
-                <div class="premium-search-actions">
-                    <a href="/medicines" class="premium-btn-reset">
-                        Reset
-                    </a>
-                    <button class="premium-btn-search" type="submit">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+    <!-- Search Form (Redesigned E-Commerce Style) -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 col-md-8 col-lg-6">
+            <form method="GET" action="/medicines">
+                <div class="nav-search-group">
+                    <input
+                        type="text"
+                        name="search"
+                        class="nav-search-input"
+                        placeholder="Search medicines, health care brands..."
+                        value="{{ search or '' }}">
+                    {% if search %}
+                        <a href="/medicines" class="text-decoration-none text-muted d-flex align-items-center justify-content-center px-3" title="Clear Search" style="font-size: 16px; hover: { color: #ef4444; }">
+                            ✕
+                        </a>
+                    {% endif %}
+                    <button class="nav-search-button px-4" type="submit">
                         Search
                     </button>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
-
-
-    <div class="row">
-
+    <div class="row g-4">
         {% for medicine in medicines %}
-
-        <div class="col-md-4 mb-4">
-
-            <div class="card shadow h-100">
-
-                <a href="/medicine?name={{ medicine.name }}">
-                {% if medicine.image %}
-                    <img src="{{ medicine.image }}"
-                         class="card-img-top"
-                         style="height:220px;object-fit:cover;">
-                {% else %}
-                    <img src="https://via.placeholder.com/300x220?text=Medicine"
-                         class="card-img-top"
-                         style="height:220px;object-fit:cover;">
-                {% endif %}
-                </a>
-
-                <div class="card-body">
-
-                    <h4>{{ medicine.item_name }}</h4>
-
-                    <hr>
-
-                    <p>
-                        <strong>Price:</strong>
-                        ₹ {{ medicine.standard_rate }}
-                    </p>
-
-                    <p>
-                        <strong>Available Stock:</strong>
-
-                        {% if medicine.available_stock > 0 %}
-                            <span class="badge bg-success">
-                                In Stock ({{ medicine.available_stock }})
-                            </span>
-                        {% else %}
-                            <span class="badge bg-danger">
-                                Out of Stock
-                            </span>
-                        {% endif %}
-                    </p>
-
-                    <div class="d-grid gap-2">
-
-                    <a href="/cart?item={{ medicine.name }}"
-                           class="btn btn-success">
-                            � Buy Now
-                        </a>
-
-                    </div>
-
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="medicine-card">
+                <div class="medicine-card-img-wrapper">
+                    {% if medicine.image %}
+                        <img src="{{ medicine.image }}" alt="{{ medicine.item_name }}">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=60" alt="{{ medicine.item_name }}">
+                    {% endif %}
+                    
+                    {% if medicine.available_stock <= 0 %}
+                        <span class="medicine-card-badge bg-danger text-white">Out of Stock</span>
+                    {% else %}
+                        <span class="medicine-card-badge bg-success text-white">In Stock ({{ medicine.available_stock|int }})</span>
+                    {% endif %}
                 </div>
 
+                <div class="medicine-card-body">
+                    <h4 class="medicine-card-title">{{ medicine.item_name }}</h4>
+
+                    <!-- Star rating indicator -->
+                    <div class="medicine-card-rating">
+                        <span>★★★★★</span>
+                        <span class="text-muted" style="font-size: 11px;">(4.7)</span>
+                    </div>
+
+                    <!-- Price layout standard selling vs mock MRP -->
+                    {% set mrp = (medicine.standard_rate * 1.25)|round(2) %}
+                    <div class="medicine-card-price-row">
+                        <span class="price-actual">₹{{ medicine.standard_rate }}</span>
+                        <span class="price-mrp">₹{{ mrp }}</span>
+                        <span class="price-discount">20% OFF</span>
+                    </div>
+
+                    <div class="d-grid mt-auto gap-2">
+                        {% if medicine.available_stock > 0 %}
+                            <a href="/add_to_cart?item={{ medicine.name }}" class="btn btn-warning">
+                                🛒 Add to Cart
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>
+                                Out of Stock
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-
         </div>
-
         {% endfor %}
-
     </div>
 
     {% if medicines|length == 0 %}
-
-    <div class="alert alert-warning text-center mt-4">
-        No medicines found.
+    <div class="alert alert-warning text-center mt-5 py-4">
+        <div class="fs-1 mb-2">🔍</div>
+        <h5>No medicines found matching your search.</h5>
+        <p class="text-muted mb-3">Try checking spelling or browsing other categories.</p>
+        <a href="/medicines" class="btn btn-primary">
+            Clear Search
+        </a>
     </div>
-
     {% endif %}
 
 </div>
+
+<!-- ================= Footer Section ================= -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand pharmacy-brand mb-3" href="/home">
+                    <span class="pharmacy-brand-icon">🏥</span>
+                    <span>Hospital Pharmacy</span>
+                </a>
+                <p class="mt-2 text-muted-50">Providing smart, secure, and fast healthcare management solutions. Easily order medicines, view reports, and manage supplies online.</p>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Useful Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/home">Home</a></li>
+                    <li class="mb-2"><a href="/medicines">Browse Medicines</a></li>
+                    <li class="mb-2"><a href="/cart_view">Shopping Cart</a></li>
+                    <li class="mb-2"><a href="/my_orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Emergency Care</h5>
+                <p class="mb-2">📞 Helpline: +91 1800-456-7890</p>
+                <p class="mb-2">✉️ Email: support@hospitalpharmacy.com</p>
+                <p>📍 Location: Block-B, City General Hospital Complex</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0">&copy; 2026 Hospital Pharmacy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
 {% endblock %}

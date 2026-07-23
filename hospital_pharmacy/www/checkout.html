@@ -6,163 +6,225 @@
 
 <div class="container mt-5">
 
-    <h2 class="mb-4">Checkout</h2>
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-dark mb-1">Secure Checkout</h2>
+        <p class="text-muted">Review items and provide your delivery options to place your order</p>
+    </div>
 
     {% if cart %}
 
-    <div class="card">
+    <!-- Two-Column Checkout Layout -->
+    <div class="checkout-grid">
 
-        <div class="card-body">
+        <!-- Left Column: Delivery & Payment Details -->
+        <div>
+            <!-- Error Alert -->
+            <div id="checkout_error" class="alert alert-danger mb-4 d-none" role="alert"></div>
 
-            <h5>Customer</h5>
-            <p>{{ cart.customer }}</p>
-
-            <table class="table table-bordered">
-
-                <thead class="table-dark">
-                    <tr>
-                        <th>Medicine</th>
-                        <th>Quantity</th>
-                        <th>Rate</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                {% for row in cart.cart_items %}
-
-                <tr>
-                    <td>{{ row.item }}</td>
-                    <td>{{ row.quantity }}</td>
-                    <td>₹ {{ row.rate }}</td>
-                    <td>₹ {{ row.amount }}</td>
-                </tr>
-
-                {% endfor %}
-
-                </tbody>
-
-            </table>
-
-            <h4 class="text-end">
-                Total : ₹ {{ cart.total_amount }}
-            </h4>
-
-            <hr>
-
-            <h4>Delivery Details</h4>
-
-            <div class="mb-3">
-                <label class="form-label">Delivery Address</label>
-
-                <textarea
-                    id="delivery_address"
-                    class="form-control"
-                    rows="4"
-                    placeholder="Enter Delivery Address"
-                    required></textarea>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Phone Number</label>
-
-                <input
-                    type="tel"
-                    id="phone_number"
-                    class="form-control"
-                    placeholder="Enter Phone Number"
-                    inputmode="numeric"
-                    autocomplete="tel"
-                    pattern="[0-9]{10}"
-                    minlength="10"
-                    maxlength="10"
-                    oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
-                    required>
-            </div>
-
-            <div class="mb-3">
-                <label for="delivery_date" class="form-label">Delivery Date</label>
-                <input
-                    type="date"
-                    id="delivery_date"
-                    class="form-control"
-                    required>
-            </div>
-
-            <button
-                id="place_order_button"
-                class="btn btn-success"
-                onclick="place_order()">
-
-                Place Order
-
-            </button>
-
-            <div id="checkout_error" class="alert alert-danger mt-3 d-none" role="alert"></div>
-
-            <div id="payment_section" class="card border-success mt-3" style="display: none;">
+            <!-- Card 1: Delivery Details -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="fw-bold text-dark mb-0">1. Delivery Address &amp; Schedule</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Payment</h5>
-                    <p class="text-muted">Confirm payment details to place your order.</p>
-
                     <div class="mb-3">
-                        <label for="payment_method" class="form-label">Payment Method</label>
-                        <select id="payment_method" class="form-select" onchange="update_payment_fields()">
-                            <option value="">Select a payment method</option>
-                            {% for mode in payment_modes %}
-                                <option value="{{ mode.name }}" data-type="{{ mode.type }}">{{ mode.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <label class="form-label">Delivery Address</label>
+                        <textarea
+                            id="delivery_address"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Enter full address where medicines should be delivered"
+                            required></textarea>
                     </div>
 
-                    <div id="payment_reference_section" class="border rounded p-3 mb-3 d-none">
-                        <h6>Reference Details</h6>
-                        <div class="mb-3">
-                            <label for="reference_no" class="form-label">Reference No</label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
                             <input
-                                type="text"
-                                id="reference_no"
+                                type="tel"
+                                id="phone_number"
                                 class="form-control"
-                                placeholder="Enter reference number">
+                                placeholder="10-digit mobile number"
+                                inputmode="numeric"
+                                autocomplete="tel"
+                                pattern="[0-9]{10}"
+                                minlength="10"
+                                maxlength="10"
+                                oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
+                                required>
                         </div>
-                        <div class="mb-3">
-                            <label for="reference_date" class="form-label">Reference Date</label>
+
+                        <div class="col-md-6">
+                            <label for="delivery_date" class="form-label">Delivery Date</label>
                             <input
                                 type="date"
-                                id="reference_date"
-                                class="form-control">
+                                id="delivery_date"
+                                class="form-control"
+                                onclick="this.showPicker()"
+                                required>
                         </div>
-                        <div class="form-text">Reference No and Reference Date are required for this payment method.</div>
                     </div>
-
-                    <button type="button" class="btn btn-primary" onclick="confirm_payment()">
-                        Confirm Payment &amp; Place Order
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="hide_payment_section()">
-                        Back
-                    </button>
                 </div>
             </div>
 
+            <!-- Card 2: Payment Steps -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="fw-bold text-dark mb-0">2. Select Payment Method</h5>
+                </div>
+                <div class="card-body">
+                    <div id="place_order_btn_wrapper">
+                        <p class="text-muted small">Verify delivery address and contact information above to proceed to payment.</p>
+                        <button
+                            id="place_order_button"
+                            class="btn btn-warning py-2.5 px-4 fw-bold shadow-sm"
+                            onclick="place_order()">
+                            Proceed to Payment
+                        </button>
+                    </div>
+
+                    <div id="payment_section" style="display: none;">
+                        <p class="text-muted mb-3">Choose a payment method to complete the checkout.</p>
+
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <select id="payment_method" class="form-select" onchange="update_payment_fields()">
+                                <option value="">Select a payment method</option>
+                                {% for mode in payment_modes %}
+                                    <option value="{{ mode.name }}" data-type="{{ mode.type }}">{{ mode.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div id="payment_reference_section" class="border rounded p-3 mb-3 bg-light d-none">
+                            <h6 class="fw-bold text-dark mb-3">Bank Reference Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="reference_no" class="form-label">Reference No</label>
+                                    <input
+                                        type="text"
+                                        id="reference_no"
+                                        class="form-control"
+                                        placeholder="Enter reference number">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="reference_date" class="form-label">Reference Date</label>
+                                    <input
+                                        type="date"
+                                        id="reference_date"
+                                        class="form-control"
+                                        onclick="this.showPicker()">
+                                </div>
+                            </div>
+                            <div class="form-text mt-2 text-danger">Reference No and Reference Date are required for this payment method.</div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success py-2.5 px-4" onclick="confirm_payment()">
+                                Confirm Payment &amp; Place Order
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary py-2.5" onclick="hide_payment_section()">
+                                Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Sticky Summary & Review Card -->
+        <div class="summary-card p-4">
+            <h5 class="fw-bold text-dark mb-3">Order Review</h5>
+            <div class="mb-3 small">
+                <span class="text-muted">Customer Account:</span>
+                <div class="fw-semibold text-dark">{{ cart.customer }}</div>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="mb-4">
+                <h6 class="fw-bold text-dark mb-2">Item Summary</h6>
+                <div class="list-group list-group-flush border rounded overflow-hidden" style="max-height: 250px; overflow-y: auto;">
+                    {% for row in cart.cart_items %}
+                    <div class="list-group-item p-2 small">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold text-dark">{{ row.item_name }}</span>
+                                <span class="text-muted d-block" style="font-size: 11px;">Qty: {{ row.quantity }} @ ₹{{ row.rate }}</span>
+                            </div>
+                            <span class="fw-semibold text-dark">₹{{ row.amount }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="summary-row">
+                <span class="text-muted">Shipping Fee</span>
+                <span class="text-success fw-bold">FREE</span>
+            </div>
+
+            <div class="summary-row total mb-0">
+                <span>Grand Total</span>
+                <span>₹{{ cart.total_amount }}</span>
+            </div>
         </div>
 
     </div>
 
     {% else %}
 
-    <div class="alert alert-warning">
-        Your shopping cart is empty.
+    <div class="card border-0 shadow-md p-5 text-center my-4">
+        <div class="fs-1 mb-3">🛒</div>
+        <h4 class="fw-bold text-dark">Your shopping cart is empty</h4>
+        <p class="text-muted mb-4">Add products to your cart before proceeding to checkout.</p>
+        <div>
+            <a href="/medicines" class="btn btn-warning px-4 py-2.5 rounded-3 fw-bold">
+                💊 Browse Medicines
+            </a>
+        </div>
     </div>
 
     {% endif %}
 
 </div>
 
+<!-- ================= Footer Section ================= -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand pharmacy-brand mb-3" href="/home">
+                    <span class="pharmacy-brand-icon">🏥</span>
+                    <span>Hospital Pharmacy</span>
+                </a>
+                <p class="mt-2 text-muted-50">Providing smart, secure, and fast healthcare management solutions. Easily order medicines, view reports, and manage supplies online.</p>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Useful Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/home">Home</a></li>
+                    <li class="mb-2"><a href="/medicines">Browse Medicines</a></li>
+                    <li class="mb-2"><a href="/cart_view">Shopping Cart</a></li>
+                    <li class="mb-2"><a href="/my_orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Emergency Care</h5>
+                <p class="mb-2">📞 Helpline: +91 1800-456-7890</p>
+                <p class="mb-2">✉️ Email: support@hospitalpharmacy.com</p>
+                <p>📍 Location: Block-B, City General Hospital Complex</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0">&copy; 2026 Hospital Pharmacy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
 <script>
 
 function place_order() {
-
     let address = document.getElementById("delivery_address").value.trim();
     let phone = document.getElementById("phone_number").value.trim();
     let delivery_date = document.getElementById("delivery_date").value;
@@ -180,13 +242,13 @@ function place_order() {
 
     hide_checkout_error();
     document.getElementById("payment_section").style.display = "block";
-    document.getElementById("place_order_button").style.display = "none";
+    document.getElementById("place_order_btn_wrapper").style.display = "none";
     document.getElementById("payment_method").focus();
 }
 
 function hide_payment_section() {
     document.getElementById("payment_section").style.display = "none";
-    document.getElementById("place_order_button").style.display = "inline-block";
+    document.getElementById("place_order_btn_wrapper").style.display = "block";
 }
 
 function confirm_payment() {
@@ -249,11 +311,8 @@ function update_payment_fields() {
 }
 
 function submit_order(address, phone, payment_method, delivery_date, reference_no, reference_date) {
-
     frappe.call({
-
         method: "hospital_pharmacy.api.create_order_from_cart",
-
         args: {
             delivery_address: address,
             phone_number: phone,
@@ -262,24 +321,15 @@ function submit_order(address, phone, payment_method, delivery_date, reference_n
             reference_no: reference_no,
             reference_date: reference_date
         },
-
         freeze: true,
         freeze_message: "Confirming payment and placing order...",
-
         callback: function(r){
-
             if(r.message && r.message.status === "success"){
-
                 frappe.msgprint("Order Created Successfully");
-
                 window.location.href="/order_success";
-
             }
-
         }
-
     });
-
 }
 
 function show_checkout_error(message) {

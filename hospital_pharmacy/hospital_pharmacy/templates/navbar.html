@@ -1,310 +1,507 @@
-<!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-
+<nav class="navbar navbar-expand-lg pharmacy-navbar sticky-top">
     <div class="container">
 
-        <a class="navbar-brand" href="/home">
-            Hospital Pharmacy
+        <!-- Logo / Brand -->
+        <a class="navbar-brand pharmacy-brand" href="/home" aria-label="Hospital Pharmacy home">
+            <span class="pharmacy-brand-icon">🏥</span>
+            <span>Hospital Pharmacy</span>
         </a>
 
-        <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <!-- Global Search Bar (prominent like Amazon/Flipkart) -->
+        <form class="nav-search-form d-none d-lg-block" action="/medicines" method="GET">
+            <div class="nav-search-group">
+                <span class="nav-search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="nav-search-input" 
+                    placeholder="Search for medicines, prescriptions..." 
+                    value="{{ search or frappe.form_dict.get('search') or '' }}">
+                <button type="submit" class="nav-search-button">
+                    Search
+                </button>
+            </div>
+        </form>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-
-            <ul class="navbar-nav ms-auto">
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/home">Home</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/medicines">Medicines</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/cart_view">Cart</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/my_orders">My Orders</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">Register</a>
-                </li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
-</nav>
-
-<br> -->
-
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow sticky-top">
-
-    <div class="container">
-
-        <!-- Logo -->
-        <a class="navbar-brand fw-bold" href="/home">
-            🏥 Hospital Pharmacy
-        </a>
-
-        <!-- Mobile Toggle -->
-        <button class="navbar-toggler"
+        <!-- Toggle Button for Mobile -->
+        <button class="navbar-toggler pharmacy-toggler"
                 type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#navbarNav"
                 aria-controls="navbarNav"
                 aria-expanded="false"
                 aria-label="Toggle navigation">
-
             <span class="navbar-toggler-icon"></span>
-
         </button>
 
         <!-- Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
+            
+            <!-- Mobile Search Bar (only visible on mobile collapse) -->
+            <form class="nav-search-form d-block d-lg-none my-3" action="/medicines" method="GET">
+                <div class="nav-search-group">
+                    <span class="nav-search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        name="search" 
+                        class="nav-search-input" 
+                        placeholder="Search for medicines..." 
+                        value="{{ search or frappe.form_dict.get('search') or '' }}">
+                    <button type="submit" class="nav-search-button">
+                        Search
+                    </button>
+                </div>
+            </form>
 
-            <ul class="navbar-nav ms-auto align-items-lg-center">
-
+            <ul class="navbar-nav ms-auto align-items-lg-center pharmacy-nav-links">
                 <li class="nav-item">
-                    <a class="nav-link" href="/home">
-                        🏠 Home
-                    </a>
+                    <a class="nav-link pharmacy-nav-link" href="/home">Home</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/medicines">
-                        💊 Medicines
-                    </a>
+                    <a class="nav-link pharmacy-nav-link" href="/medicines">Medicines</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/cart_view">
-                        🛒 Cart
-                    </a>
+                    <a class="nav-link pharmacy-nav-link" href="/order_tracking">Track Order</a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/my_orders">
-                        📦 My Orders
-                    </a>
-                </li>
-
-                {% if frappe.session.user == "Guest" %}
-
+                {% if frappe.session.user not in ["Administrator", "Guest"] %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/register">
-                            👤 Register
+                        <a class="nav-link pharmacy-nav-link" href="/cart_view">
+                            <span class="nav-cart-wrapper">
+                                🛒 Cart
+                                {% set cart_count = frappe.db.sql("select sum(quantity) from `tabCart Item` ci join `tabShopping Cart` sc on ci.parent = sc.name where sc.user = %s and sc.status = 'Open'", (frappe.session.user,))[0][0] or 0 %}
+                                {% if cart_count > 0 %}
+                                    <span class="nav-cart-badge">{{ cart_count }}</span>
+                                {% endif %}
+                            </span>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="/login">
-                            🔑 Sign In
-                        </a>
+                        <a class="nav-link pharmacy-nav-link" href="/my_orders">My Orders</a>
                     </li>
-
-                {% else %}
-
-                    <li class="nav-item">
-                        <span class="nav-link text-light">
-                            👋 {{ frappe.utils.get_fullname(frappe.session.user) }}
-                        </span>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link text-warning" href="/logout">
-                            🚪 Logout
-                        </a>
-                    </li>
-
                 {% endif %}
 
+                {% set user_name = frappe.session.user
+                    if frappe.session.user == "Guest"
+                    else frappe.db.get_value("User", frappe.session.user, "full_name")
+                    or frappe.db.get_value("User", frappe.session.user, "first_name")
+                    or frappe.session.user %}
+
+                {% set force_guest = (force_guest if force_guest is defined else false) or (frappe.form_dict.get("logged_out") == "1") %}
+
+                {% if frappe.session.user == "Guest" or force_guest %}
+                    <li class="nav-item pharmacy-nav-separator d-none d-lg-block"></li>
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-nav-link" href="/login">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-register-link text-white" href="/register">Register</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item pharmacy-nav-separator d-none d-lg-block"></li>
+                    {% if frappe.session.user == "Administrator" %}
+                        <li class="nav-item">
+                            <a class="nav-link pharmacy-admin-link" href="/app">Admin Desk</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <span class="pharmacy-user-chip" title="View profile & change password" data-bs-toggle="modal" data-bs-target="#userProfileModal" onclick="openUserProfileModal()">
+                            <span class="pharmacy-user-initial">{{ user_name[:1]|upper }}</span>
+                            <span>Hi, {{ user_name }}</span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pharmacy-signout-link" href="/logout" onclick="handleSignOut(event)">Sign Out</a>
+                    </li>
+                {% endif %}
             </ul>
-
         </div>
-
     </div>
-
 </nav>
 
-<br>
-
-<section class="hero-section">
-
-    <div class="container">
-
-        <div class="row align-items-center">
-
-            <div class="col-md-6">
-
-                <h1 class="display-4 fw-bold">
-                    🏥 Hospital Pharmacy
-                </h1>
-
-                <p class="lead mt-3">
-                    Your Trusted Online Medical Store
-                </p>
-
-                <p>
-                    Order genuine medicines safely from anywhere.
-                    Fast delivery, affordable prices and secure shopping.
-                </p>
-
-                <a href="/medicines" class="btn btn-primary btn-lg">
-                    💊 Browse Medicines
-                </a>
-
+<!-- User Profile Modal -->
+<div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileModalLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 bg-light p-4" style="background: linear-gradient(135deg, rgba(13, 148, 136, 0.05), rgba(13, 148, 136, 0.02)) !important;">
+                <h5 class="modal-title fw-bold text-slate-800" id="userProfileModalLabel">Account Details</h5>
+                <button type="button" class="modal-custom-close-btn" data-bs-dismiss="modal" aria-label="Close" onclick="closeUserProfileModal()">&times;</button>
             </div>
+            <!-- Modal Body -->
+            <div class="modal-body p-4">
+                <!-- User Summary Card -->
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold shadow-sm" 
+                         style="width: 72px; height: 72px; font-size: 28px; background: rgba(13, 148, 136, 0.1) !important; color: #0d9488 !important; border: 2px solid rgba(13, 148, 136, 0.2);">
+                        {{ user_name[:1]|upper }}
+                    </div>
+                    <h4 class="mt-3 fw-bold text-slate-800 mb-1">{{ user_name }}</h4>
+                    <p class="text-muted small mb-3">{{ frappe.session.user }}</p>
+                    
+                    <button class="btn btn-outline-secondary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 mb-3" 
+                            type="button" onclick="globalToggleTheme()">
+                        🌓 Toggle Theme
+                    </button>
+                </div>
 
-            <div class="col-md-6 text-center">
+                <hr class="my-3" style="opacity: 0.1;">
 
-                <img src="/assets/hospital_pharmacy/images/pharmacy-banner.png"
-                     class="img-fluid rounded shadow">
+                <!-- Reset Options -->
+                <div class="d-grid gap-3">
+                    <!-- Action Options Toggle Buttons -->
+                    <button class="btn btn-outline-teal w-100 rounded-pill d-flex align-items-center justify-content-center gap-2" 
+                            type="button" onclick="toggleChangePasswordCollapse()"
+                            style="border-color: #0d9488 !important; color: #0d9488 !important;">
+                        🔑 Change Password Directly
+                    </button>
+                    
+                    <button class="btn btn-light w-100 rounded-pill text-muted small" 
+                            onclick="sendResetPasswordEmail('{{ frappe.session.user }}')"
+                            id="btnSendResetEmail">
+                        ✉️ Send Reset Password Email
+                    </button>
+                </div>
 
+                <!-- Collapsible Direct Change Password Form -->
+                <div class="collapse mt-4" id="changePasswordCollapse">
+                    <form id="changePasswordForm" onsubmit="submitChangePassword(event)">
+                        <div class="mb-3">
+                            <label class="form-label text-slate-700 small fw-bold">Current Password</label>
+                            <input type="password" class="form-control rounded-pill" id="oldPasswordInput" required placeholder="Enter current password">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-slate-700 small fw-bold">New Password</label>
+                            <input type="password" class="form-control rounded-pill" id="newPasswordInput" required placeholder="Enter new password">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-slate-700 small fw-bold">Confirm New Password</label>
+                            <input type="password" class="form-control rounded-pill" id="confirmPasswordInput" required placeholder="Confirm new password">
+                        </div>
+                        <div id="passwordAlert" class="alert d-none py-2 px-3 small rounded-lg"></div>
+                        <button type="submit" class="btn btn-teal w-100 rounded-pill mt-2" id="btnSubmitPasswordChange">
+                            Update Password
+                        </button>
+                    </form>
+                </div>
             </div>
-
         </div>
-
     </div>
+</div>
+
+<script>
+function closeUserProfileModal() {
+    const modalEl = document.getElementById('userProfileModal');
+    if (!modalEl) return;
+    try {
+        let modalInst = bootstrap.Modal.getInstance(modalEl);
+        if (modalInst) {
+            modalInst.hide();
+        } else {
+            modalInst = new bootstrap.Modal(modalEl);
+            modalInst.hide();
+        }
+    } catch(e) {
+        try {
+            $('#userProfileModal').modal('hide');
+        } catch(err) {}
+    }
+    
+    // Fallback manual DOM updates
+    modalEl.classList.remove('show');
+    modalEl.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    const bd = document.getElementById('modalBackdropFallback');
+    if (bd) bd.remove();
+    
+    const bsBackdrops = document.querySelectorAll('.modal-backdrop');
+    bsBackdrops.forEach(b => b.remove());
+}
+
+function openUserProfileModal() {
+    const modalEl = document.getElementById('userProfileModal');
+    if (!modalEl) return;
+    try {
+        let modalInst = bootstrap.Modal.getInstance(modalEl);
+        if (!modalInst) {
+            modalInst = new bootstrap.Modal(modalEl);
+        }
+        modalInst.show();
+    } catch(e) {
+        try {
+            $('#userProfileModal').modal('show');
+        } catch(err) {
+            // Manual DOM fallback
+            modalEl.classList.add('show');
+            modalEl.style.display = 'block';
+            document.body.classList.add('modal-open');
+            
+            let backdrop = document.getElementById('modalBackdropFallback');
+            if (!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                backdrop.id = 'modalBackdropFallback';
+                backdrop.style.zIndex = '1040';
+                document.body.appendChild(backdrop);
+            }
+            
+            const closeBtns = modalEl.querySelectorAll('[data-bs-dismiss="modal"]');
+            closeBtns.forEach(btn => {
+                btn.onclick = function() {
+                    closeUserProfileModal();
+                };
+            });
+        }
+    }
+}
+
+function toggleChangePasswordCollapse() {
+    const collapseEl = document.getElementById('changePasswordCollapse');
+    if (!collapseEl) return;
+    try {
+        let collapseInst = bootstrap.Collapse.getInstance(collapseEl);
+        if (!collapseInst) {
+            collapseInst = new bootstrap.Collapse(collapseEl);
+        }
+        collapseInst.toggle();
+    } catch(e) {
+        try {
+            $('#changePasswordCollapse').collapse('toggle');
+        } catch(err) {
+            if (collapseEl.classList.contains('show')) {
+                collapseEl.classList.remove('show');
+            } else {
+                collapseEl.classList.add('show');
+            }
+        }
+    }
+}
+
+function sendResetPasswordEmail(email) {
+    const btn = document.getElementById('btnSendResetEmail');
+    if (!btn || btn.disabled) return;
+    
+    btn.disabled = true;
+    btn.innerHTML = 'Sending reset email...';
+    
+    frappe.call({
+        method: 'frappe.core.doctype.user.user.reset_password',
+        args: { user: email },
+        callback: function(r) {
+            btn.innerHTML = '✉️ Reset Email Sent!';
+            btn.classList.remove('btn-light');
+            btn.classList.add('btn-success', 'text-white');
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '✉️ Send Reset Password Email';
+                btn.classList.remove('btn-success', 'text-white');
+                btn.classList.add('btn-light');
+            }, 5000);
+        },
+        error: function(err) {
+            btn.disabled = false;
+            btn.innerHTML = '✉️ Failed to send email. Try again.';
+            btn.classList.add('btn-danger', 'text-white');
+        }
+    });
+}
+
+function validatePasswordRequirements(password, identifier) {
+    if (!password) return "Password is required.";
+    if (password.length < 8) return "Password must be at least 8 characters long.";
+    if (password.length > 32) return "Password must not exceed 32 characters.";
+    if (!/[A-Z]/.test(password)) return "Password must contain at least 1 uppercase letter (A-Z).";
+    if (!/[a-z]/.test(password)) return "Password must contain at least 1 lowercase letter (a-z).";
+    if (!/[0-9]/.test(password)) return "Password must contain at least 1 number (0-9).";
+    
+    // Special characters
+    const specialChars = /[!@#\$%\^&\*\(\)_\+\-=\{\}\[\]:;"'<>\,\.\?\/]/;
+    if (!specialChars.test(password)) {
+        return "Password must contain at least 1 special character.";
+    }
+    
+    if (/\s/.test(password)) {
+        return "Password must not contain spaces.";
+    }
+    
+    if (identifier) {
+        const idLower = identifier.toLowerCase().trim();
+        const pwdLower = password.toLowerCase();
+        if (pwdLower === idLower || (idLower.includes('@') && pwdLower === idLower.split('@')[0])) {
+            return "Password should not be the same as your username or email.";
+        }
+    }
+    
+    const commonPasswords = ["password123", "12345678", "qwerty", "password", "123456", "admin123", "welcome123"];
+    if (commonPasswords.includes(password.toLowerCase())) {
+        return "Password is too common. Please choose a stronger password.";
+    }
+    
+    return null;
+}
+
+function submitChangePassword(event) {
+    event.preventDefault();
+    const oldPassword = document.getElementById('oldPasswordInput').value;
+    const newPassword = document.getElementById('newPasswordInput').value;
+    const confirmPassword = document.getElementById('confirmPasswordInput').value;
+    const alertDiv = document.getElementById('passwordAlert');
+    const submitBtn = document.getElementById('btnSubmitPasswordChange');
+    
+    if (newPassword !== confirmPassword) {
+        alertDiv.className = 'alert alert-danger py-2 px-3 small rounded-lg';
+        alertDiv.innerHTML = 'New passwords do not match.';
+        alertDiv.classList.remove('d-none');
+        return;
+    }
+    
+    const pwdErr = validatePasswordRequirements(newPassword, '{{ frappe.session.user }}');
+    if (pwdErr) {
+        alertDiv.className = 'alert alert-danger py-2 px-3 small rounded-lg';
+        alertDiv.innerHTML = pwdErr;
+        alertDiv.classList.remove('d-none');
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Updating...';
+    alertDiv.classList.add('d-none');
+    
+    frappe.call({
+        method: 'frappe.core.doctype.user.user.update_password',
+        args: {
+            old_password: oldPassword,
+            new_password: newPassword,
+            logout_all_sessions: 0
+        },
+        callback: function(r) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Update Password';
+            
+            if (r.message && r.message.indexOf && r.message.indexOf('expired') !== -1) {
+                alertDiv.className = 'alert alert-danger py-2 px-3 small rounded-lg';
+                alertDiv.innerHTML = r.message;
+                alertDiv.classList.remove('d-none');
+            } else {
+                alertDiv.className = 'alert alert-success py-2 px-3 small rounded-lg';
+                alertDiv.innerHTML = 'Password updated successfully!';
+                alertDiv.classList.remove('d-none');
+                
+                // Clear inputs
+                document.getElementById('changePasswordForm').reset();
+                setTimeout(() => {
+                    alertDiv.classList.add('d-none');
+                    // Collapse form
+                    toggleChangePasswordCollapse();
+                }, 3000);
+            }
+        },
+        error: function(err) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Update Password';
+            alertDiv.className = 'alert alert-danger py-2 px-3 small rounded-lg';
+            alertDiv.innerHTML = err.message || 'Error updating password. Verify current password.';
+            alertDiv.classList.remove('d-none');
+        }
+    });
+}
+
+function handleSignOut(event) {
+    event.preventDefault();
+    try {
+        sessionStorage.clear();
+        localStorage.clear();
+    } catch(e) {}
+    window.location.href = "/logout?t=" + new Date().getTime();
+}
+
+// Global Theme Toggling Functions
+function globalToggleTheme() {
+    const isDark = document.body.classList.contains('dark-theme') || document.documentElement.classList.contains('dark-theme');
+    const newIsDark = !isDark;
+    if (newIsDark) {
+        document.body.classList.add('dark-theme');
+        document.documentElement.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.body.classList.remove('dark-theme');
+        document.documentElement.classList.remove('dark-theme');
+        localStorage.setItem('theme', 'light');
+    }
+    const wrapper = document.getElementById('mainDashboardWrapper');
+    if (wrapper) {
+        if (newIsDark) {
+            wrapper.classList.add('dark-mode-override');
+        } else {
+            wrapper.classList.remove('dark-mode-override');
+        }
+    }
+}
+
+// Apply theme immediately
+(function() {
+    try {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    } catch(e) {}
+})();
+
+// Force a reload if page is retrieved from BFcache (Back-Forward Cache) to sync auth state
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Apply saved theme to body
+    try {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+    } catch(e) {}
+
+    const navbar = document.querySelector('.pharmacy-navbar');
+    if (navbar) {
+        function checkScroll() {
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+        window.addEventListener('scroll', checkScroll, { passive: true });
+        checkScroll();
+    }
+});
+</script>
+
+<style>
+/* Bulletproof Dark Theme Overrides to bypass caching issues */
+body.dark-theme .quick-card,
+html.dark-theme .quick-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+body.dark-theme .quick-card-icon,
+html.dark-theme .quick-card-icon {
+    background: rgba(13, 148, 136, 0.15) !important;
+    color: #2dd4bf !important;
+}
+body.dark-theme .quick-card h4,
+html.dark-theme .quick-card h4 {
+    color: #f8fafc !important;
+}
+body.dark-theme .product-detail-img-box,
+html.dark-theme .product-detail-img-box {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+</style>
 
-</section>
-
-<section class="container mt-5">
-
-    <h2 class="text-center mb-4">
-        Why Choose Us?
-    </h2>
-
-    <div class="row">
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h1>💊</h1>
-
-                <h5>Genuine Medicines</h5>
-
-                <p>100% authentic medicines.</p>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h1>🚚</h1>
-
-                <h5>Fast Delivery</h5>
-
-                <p>Quick home delivery.</p>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h1>💳</h1>
-
-                <h5>Secure Payment</h5>
-
-                <p>Safe online ordering.</p>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h1>📞</h1>
-
-                <h5>24×7 Support</h5>
-
-                <p>Customer assistance anytime.</p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<section class="container mt-5">
-
-    <h2 class="text-center mb-4">
-
-        Popular Categories
-
-    </h2>
-
-    <div class="row">
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h2>💊</h2>
-
-                <h5>Tablets</h5>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h2>🧴</h2>
-
-                <h5>Syrups</h5>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h2>💉</h2>
-
-                <h5>Injections</h5>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-4">
-
-                <h2>🩹</h2>
-
-                <h5>First Aid</h5>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>

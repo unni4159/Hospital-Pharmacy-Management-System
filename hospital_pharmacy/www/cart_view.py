@@ -12,6 +12,8 @@ def get_context(context):
         context.cart = None
         return context
 
+    context.error = frappe.form_dict.get("error")
+
     from hospital_pharmacy.api import sync_quotation_to_shopping_cart
     sync_quotation_to_shopping_cart(frappe.session.user)
 
@@ -25,6 +27,17 @@ def get_context(context):
     )
 
     if cart_name:
-        context.cart = frappe.get_doc("Shopping Cart", cart_name)
+        cart = frappe.get_doc("Shopping Cart", cart_name)
+        for row in cart.cart_items:
+            item_info = frappe.db.get_value("Item", row.item, ["item_name", "image"], as_dict=True) or {}
+            row.item_name = item_info.get("item_name") or row.item
+            row.image = item_info.get("image")
+            stock = frappe.db.sql("""
+                SELECT COALESCE(SUM(actual_qty), 0)
+                FROM `tabBin`
+                WHERE item_code=%s
+            """, row.item)[0][0]
+            row.available_stock = stock
+        context.cart = cart
     else:
         context.cart = None
