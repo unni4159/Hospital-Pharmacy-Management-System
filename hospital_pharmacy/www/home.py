@@ -1,12 +1,65 @@
+# pyrefly: ignore [missing-import]
 import frappe
 
-def get_context(context):
+no_cache = 1
 
+def get_context(context):
     context.user = frappe.session.user
+
+    # Fetch featured medicines for homepage display
+    items = frappe.get_all(
+        "Item",
+        filters={"disabled": 0, "is_stock_item": 1},
+        fields=["name", "item_code", "item_name", "stock_uom", "image"],
+        limit=8,
+        order_by="creation desc"
+    )
+
+    featured_medicines = []
+    for item in items:
+        # Get Standard Selling Price
+        price = frappe.db.get_value(
+            "Item Price",
+            {
+                "item_code": item.item_code,
+                "price_list": "Standard Selling"
+            },
+            "price_list_rate"
+        ) or 0
+
+        # Check for Pricing Rule discount
+        discount_percentage = frappe.db.get_value(
+            "Pricing Rule",
+            {
+                "item_code": item.item_code,
+                "disable": 0,
+                "apply_on": "Item Code"
+            },
+            "discount_percentage"
+        ) or 0
+
+        item.standard_rate = price
+        item.discount_percentage = discount_percentage
+        if discount_percentage:
+            item.discounted_rate = price * (1.0 - (discount_percentage / 100.0))
+        else:
+            item.discounted_rate = price
+
+        # Get Available Stock
+        stock = frappe.db.sql("""
+            SELECT COALESCE(SUM(actual_qty),0)
+            FROM `tabBin`
+            WHERE item_code=%s
+        """, item.item_code)[0][0]
+        item.available_stock = stock
+
+        featured_medicines.append(item)
+
+    context.featured_medicines = featured_medicines
 
     if frappe.session.user == "Guest":
         context.roles = []
-        return
+        return context
 
     roles = frappe.get_roles(frappe.session.user)
     context.roles = roles

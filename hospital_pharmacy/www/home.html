@@ -2,252 +2,335 @@
 
 {% block page_content %}
 
-<div class="container mt-5">
+{% include "hospital_pharmacy/templates/navbar.html" %}
 
-    <div class="text-center">
-
-        <h1 class="display-4">🏥 Hospital Pharmacy Management System</h1>
-
-        <h3 class="mt-3">
-            Welcome, {{ user }}
-        </h3>
-
-        <p class="lead">
-            Online Hospital Pharmacy Portal
-        </p>
-
-        <hr class="my-4">
-
-        <a href="/profile" class="btn btn-dark me-2">
-            👤 My Profile
-        </a>
-
-        <a href="/logout" class="btn btn-outline-danger">
-            🚪 Logout
-        </a>
-
+<!-- ================= Hero Section (Bootstrap Carousel) ================= -->
+<div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
     </div>
-
-    <div class="row mt-5">
-
-        <!-- Administrator -->
-        {% if is_admin %}
-
-        <div class="col-md-4 mb-3">
-            <a href="/dashboard" class="btn btn-primary btn-lg w-100">
-                📊 Dashboard
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/medicines" class="btn btn-success btn-lg w-100">
-                💊 Browse Medicines
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/search" class="btn btn-info btn-lg w-100">
-                🔍 Search Medicines
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/cart" class="btn btn-success btn-lg w-100">
-                🛒 Shopping Cart
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/suppliers" class="btn btn-primary btn-lg w-100">
-                🏢 Suppliers
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/my_orders" class="btn btn-secondary btn-lg w-100">
-                📦 My Orders
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/order_history" class="btn btn-dark btn-lg w-100">
-                📜 Order History
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/sales_report" class="btn btn-warning btn-lg w-100">
-                💰 Sales Report
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/purchase_report" class="btn btn-secondary btn-lg w-100">
-                🚚 Purchase Report
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/low_stock" class="btn btn-danger btn-lg w-100">
-                ⚠️ Low Stock Report
-            </a>
-        </div>
-
-        <!-- Store Manager -->
-        {% elif is_manager %}
-
-        <div class="col-md-4 mb-3">
-            <a href="/dashboard" class="btn btn-primary btn-lg w-100">
-                📊 Dashboard
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/suppliers" class="btn btn-primary btn-lg w-100">
-                🏢 Suppliers
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/search" class="btn btn-info btn-lg w-100">
-                🔍 Search Medicines
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/purchase_report" class="btn btn-secondary btn-lg w-100">
-                🚚 Purchase Report
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/sales_report" class="btn btn-warning btn-lg w-100">
-                💰 Sales Report
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/low_stock" class="btn btn-danger btn-lg w-100">
-                ⚠️ Low Stock Report
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/order_history" class="btn btn-dark btn-lg w-100">
-                📜 Order History
-            </a>
-        </div>
-
-        <!-- Pharmacist -->
-        {% elif is_pharmacist %}
-
-        <div class="col-md-4 mb-3">
-            <a href="/medicines" class="btn btn-success btn-lg w-100">
-                💊 Browse Medicines
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/search" class="btn btn-info btn-lg w-100">
-                🔍 Search Medicines
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/cart" class="btn btn-success btn-lg w-100">
-                🛒 Shopping Cart
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/sales_report" class="btn btn-warning btn-lg w-100">
-                💰 Sales Report
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/low_stock" class="btn btn-danger btn-lg w-100">
-                ⚠️ Low Stock Report
-            </a>
-        </div>
-
-        <!-- Customer -->
-        {% elif is_customer %}
-
-        <div class="col-md-4 mb-3">
-            <a href="/medicines" class="btn btn-success btn-lg w-100">
-                💊 Browse Medicines
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/search" class="btn btn-info btn-lg w-100">
-                🔍 Search Medicines
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/cart" class="btn btn-success btn-lg w-100">
-                🛒 Shopping Cart
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/my_orders" class="btn btn-secondary btn-lg w-100">
-                📦 My Orders
-            </a>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <a href="/order_history" class="btn btn-dark btn-lg w-100">
-                📜 Order History
-            </a>
-        </div>
-
-        {% else %}
-
-        <div class="col-12">
-            <div class="alert alert-warning text-center">
-                No role assigned to this user.
+    <div class="carousel-inner">
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+            <div class="carousel-slide-content container">
+                <div class="carousel-slide-text text-start">
+                    <span class="badge bg-success mb-3">100% Genuine Medicines</span>
+                    <h2>Smart Online Pharmacy Management</h2>
+                    <p>Access prescription drugs, check live stock, and order from anywhere. Trusted healthcare support at your fingertips.</p>
+                    <div class="mt-4">
+                        <a href="/medicines" class="btn btn-warning btn-lg px-4 py-2.5">
+                            Browse Medicines ➔
+                        </a>
+                    </div>
+                </div>
+                <div class="carousel-slide-img d-none d-md-flex">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966483.png" alt="Hospital Pharmacy">
+                </div>
             </div>
         </div>
-
-        {% endif %}
-
-    </div>
-
-    <div class="card mt-5 shadow">
-
-        <div class="card-header bg-primary text-white">
-            <h4>About the System</h4>
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+            <div class="carousel-slide-content container">
+                <div class="carousel-slide-text text-start">
+                    <span class="badge bg-success mb-3">Lightning Fast</span>
+                    <h2>Express Doorstep Delivery</h2>
+                    <p>We pack and ship your essential medications with extreme safety protocols. Select your custom delivery date at checkout.</p>
+                    <div class="mt-4">
+                        <a href="/medicines" class="btn btn-warning btn-lg px-4 py-2.5">
+                            Shop Now ➔
+                        </a>
+                    </div>
+                </div>
+                <div class="carousel-slide-img d-none d-md-flex">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" alt="Express Delivery">
+                </div>
+            </div>
         </div>
-
-        <div class="card-body">
-
-            <p>
-                This Hospital Pharmacy Management System is developed using ERPNext and the Frappe Framework.
-            </p>
-
-            <ul>
-                <li>💊 Medicine Management</li>
-                <li>🏢 Supplier Management</li>
-                <li>📦 Purchase Management</li>
-                <li>🧾 Sales Invoice</li>
-                <li>📈 Sales Report</li>
-                <li>📉 Purchase Report</li>
-                <li>⚠️ Low Stock Monitoring</li>
-                <li>🔍 Medicine Search</li>
-                <li>🛒 Shopping Cart</li>
-                <li>📦 My Orders</li>
-                <li>📜 Order History</li>
-                <li>👤 User Profile</li>
-                <li>🔐 Role-Based Login</li>
-            </ul>
-
+        <!-- Slide 3 -->
+        <div class="carousel-item">
+            <div class="carousel-slide-content container">
+                <div class="carousel-slide-text text-start">
+                    <span class="badge bg-success mb-3">Hassle-Free</span>
+                    <h2>Secure Orders & History</h2>
+                    <p>Keep a complete record of your order invoices, active cart, and delivery addresses on our secure dashboard.</p>
+                    <div class="mt-4">
+                        {% if user == "Guest" %}
+                            <a href="/login" class="btn btn-warning btn-lg px-4 py-2.5">Sign In / Register</a>
+                        {% else %}
+                            <a href="/my_orders" class="btn btn-warning btn-lg px-4 py-2.5">View Orders ➔</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="carousel-slide-img d-none d-md-flex">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966431.png" alt="Secure Dashboard">
+                </div>
+            </div>
         </div>
-
     </div>
-
 </div>
+
+<!-- ================= Quick Access Dashboard ================= -->
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <span class="text-uppercase text-muted fw-bold tracking-wider" style="font-size:12px; letter-spacing: 0.1em;">Control Panel</span>
+        <h2 class="fw-bold text-dark mt-1">Dashboard Quick Access</h2>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        {% if is_admin %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">⚙️</div>
+                    <h4>Admin Desk</h4>
+                    <a href="/app" class="btn btn-outline-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">📊</div>
+                    <h4>Dashboard</h4>
+                    <a href="/dashboard" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">🏢</div>
+                    <h4>Suppliers</h4>
+                    <a href="/suppliers" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">💰</div>
+                    <h4>Sales Report</h4>
+                    <a href="/sales_report" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">⚠️</div>
+                    <h4>Low Stock</h4>
+                    <a href="/low_stock" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+        {% elif is_manager %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">📊</div>
+                    <h4>Dashboard</h4>
+                    <a href="/dashboard" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">🏢</div>
+                    <h4>Suppliers</h4>
+                    <a href="/suppliers" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">💰</div>
+                    <h4>Sales Report</h4>
+                    <a href="/sales_report" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="quick-card">
+                    <div class="quick-card-icon">⚠️</div>
+                    <h4>Low Stock</h4>
+                    <a href="/low_stock" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+        {% elif is_pharmacist %}
+            <div class="col-6 col-md-4 col-lg-4">
+                <div class="quick-card">
+                    <div class="quick-card-icon">💊</div>
+                    <h4>Browse Medicines</h4>
+                    <a href="/medicines" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-4">
+                <div class="quick-card">
+                    <div class="quick-card-icon">🛒</div>
+                    <h4>Shopping Cart</h4>
+                    <a href="/cart_view" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-4">
+                <div class="quick-card">
+                    <div class="quick-card-icon">💰</div>
+                    <h4>Sales Report</h4>
+                    <a href="/sales_report" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+        {% elif is_customer %}
+            <div class="col-6 col-md-4 col-lg-4">
+                <div class="quick-card">
+                    <div class="quick-card-icon">💊</div>
+                    <h4>Browse Medicines</h4>
+                    <a href="/medicines" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-4">
+                <div class="quick-card">
+                    <div class="quick-card-icon">🛒</div>
+                    <h4>Shopping Cart</h4>
+                    <a href="/cart_view" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-4">
+                <div class="quick-card">
+                    <div class="quick-card-icon">📦</div>
+                    <h4>My Orders</h4>
+                    <a href="/my_orders" class="btn btn-primary">Open</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    🔒 No specific role assigned to your account. Go to <a href="/medicines">Medicines</a> to browse the catalog.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ================= Featured Medicines (Amazon Product Grid) ================= -->
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Featured Products</h2>
+        <a href="/medicines" class="text-decoration-none fw-bold text-teal" style="color: var(--primary-color);">View all medicines ➔</a>
+    </div>
+
+    <div class="row g-4">
+        {% for medicine in featured_medicines %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="medicine-card">
+                <div class="medicine-card-img-wrapper">
+                    {% if medicine.image %}
+                        <img src="{{ medicine.image }}" alt="{{ medicine.item_name }}">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=60" alt="{{ medicine.item_name }}">
+                    {% endif %}
+                    
+                    {% if medicine.available_stock <= 0 %}
+                        <span class="medicine-card-badge bg-danger text-white">Out of Stock</span>
+                    {% else %}
+                        <span class="medicine-card-badge bg-success text-white">In Stock</span>
+                    {% endif %}
+                </div>
+
+                <div class="medicine-card-body">
+                    <h4 class="medicine-card-title">{{ medicine.item_name }}</h4>
+
+                    <!-- Star rating indicator -->
+                    <div class="medicine-card-rating">
+                        <span>★★★★★</span>
+                        <span class="text-muted" style="font-size: 11px;">(4.8)</span>
+                    </div>
+
+                    <!-- Price layout standard selling vs mock MRP -->
+                    {% if medicine.discount_percentage %}
+                        <div class="medicine-card-price-row">
+                            <span class="price-actual">₹{{ medicine.discounted_rate|round(2) }}</span>
+                            <span class="price-mrp">₹{{ medicine.standard_rate|round(2) }}</span>
+                            <span class="price-discount">{{ medicine.discount_percentage|int }}% OFF</span>
+                        </div>
+                    {% else %}
+                        {% set mrp = (medicine.standard_rate * 1.25)|round(2) %}
+                        <div class="medicine-card-price-row">
+                            <span class="price-actual">₹{{ medicine.standard_rate }}</span>
+                            <span class="price-mrp">₹{{ mrp }}</span>
+                            <span class="price-discount">20% OFF</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid mt-auto">
+                        {% if medicine.available_stock > 0 %}
+                            <a href="/add_to_cart?item={{ medicine.name }}" class="btn btn-warning">
+                                🛒 Add to Cart
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>
+                                Out of Stock
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ================= E-Commerce Feature Badges ================= -->
+<div class="container my-5 py-4" style="border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="row g-4 text-center">
+        <div class="col-6 col-md-3">
+            <div class="p-3">
+                <div class="fs-2 mb-2">🛡️</div>
+                <h6 class="fw-bold">100% Genuine</h6>
+                <p class="text-muted small mb-0">Direct from certified pharmaceutical labs</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3">
+                <div class="fs-2 mb-2">🚚</div>
+                <h6 class="fw-bold">Fast Delivery</h6>
+                <p class="text-muted small mb-0">Free shipping on orders above ₹500</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3">
+                <div class="fs-2 mb-2">🔒</div>
+                <h6 class="fw-bold">Secure Gateway</h6>
+                <p class="text-muted small mb-0">Fully encrypted checkout process</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3">
+                <div class="fs-2 mb-2">📞</div>
+                <h6 class="fw-bold">24x7 Assistance</h6>
+                <p class="text-muted small mb-0">Live customer support and pharmacists</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= Footer Section ================= -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand pharmacy-brand mb-3" href="/home">
+                    <span class="pharmacy-brand-icon">🏥</span>
+                    <span>Hospital Pharmacy</span>
+                </a>
+                <p class="mt-2 text-muted-50">Providing smart, secure, and fast healthcare management solutions. Easily order medicines, view reports, and manage supplies online.</p>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Useful Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/home">Home</a></li>
+                    <li class="mb-2"><a href="/medicines">Browse Medicines</a></li>
+                    <li class="mb-2"><a href="/cart_view">Shopping Cart</a></li>
+                    <li class="mb-2"><a href="/my_orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Emergency Care</h5>
+                <p class="mb-2">📞 Helpline: +91 1800-456-7890</p>
+                <p class="mb-2">✉️ Email: support@hospitalpharmacy.com</p>
+                <p>📍 Location: Block-B, City General Hospital Complex</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0">&copy; 2026 Hospital Pharmacy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
 {% endblock %}

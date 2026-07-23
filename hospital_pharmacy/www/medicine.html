@@ -6,87 +6,169 @@
 
 <div class="container mt-5">
 
-    <div class="card shadow">
+    <div class="card shadow-premium border-0 overflow-hidden mb-5">
+        <div class="card-body p-4 p-md-5">
 
-        <div class="card-body">
+            <div class="row g-5">
 
-            <h2>{{ medicine.item_name }}</h2>
+                <!-- Left Column: Image Gallery (E-Commerce Style) -->
+                <div class="col-md-5">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="product-detail-img-box">
+                                {% if medicine.image %}
+                                    <img src="{{ medicine.image }}" alt="{{ medicine.item_name }}">
+                                {% else %}
+                                    <img src="https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=60" alt="{{ medicine.item_name }}">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="border rounded-3 overflow-hidden bg-light d-flex align-items-center justify-content-center" style="height: 120px; padding: 10px;">
+                                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&auto=format&fit=crop&q=60"
+                                     alt="Certified Laboratory Quality"
+                                     class="img-fluid"
+                                     style="max-height: 100%; object-fit: contain;">
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="border rounded-3 overflow-hidden bg-light d-flex align-items-center justify-content-center" style="height: 120px; padding: 10px;">
+                                <img src="https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500&auto=format&fit=crop&q=60"
+                                     alt="Authentic Packaging"
+                                     class="img-fluid"
+                                     style="max-height: 100%; object-fit: cover; width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <hr>
-
-            <table class="table">
-
-                <tr>
-                    <th>Item Code</th>
-                    <td>{{ medicine.item_code }}</td>
-                </tr>
-
-                <tr>
-                    <th>Item Group</th>
-                    <td>{{ medicine.item_group }}</td>
-                </tr>
-
-                <tr>
-                    <th>Unit</th>
-                    <td>{{ medicine.stock_uom }}</td>
-                </tr>
-
-                <tr>
-                    <th>Price</th>
-                    <td>₹ {{ medicine.standard_rate }}</td>
-                </tr>
-
-                <tr>
-                    <th>Available Stock</th>
-                    <td>
+                <!-- Right Column: Product Core Details -->
+                <div class="col-md-7">
+                    <div class="mb-3 d-flex align-items-center gap-2">
+                        <span class="badge bg-secondary px-3 py-1.5 fs-7">{{ medicine.item_group }}</span>
                         {% if medicine.available_stock > 0 %}
-                            <span class="badge bg-success">
-                                In Stock ({{ medicine.available_stock }})
-                            </span>
+                            <span class="badge bg-success px-3 py-1.5 fs-7">In Stock</span>
                         {% else %}
-                            <span class="badge bg-danger">
-                                Out of Stock
-                            </span>
+                            <span class="badge bg-danger px-3 py-1.5 fs-7">Out of Stock</span>
                         {% endif %}
-                    </td>
-                </tr>
+                    </div>
 
-                <tr>
-                    <th>Description</th>
-                    <td>{{ medicine.description or "No Description" }}</td>
-                </tr>
+                    <h1 class="fw-bold text-dark mb-1" style="font-size: 28px;">{{ medicine.item_name }}</h1>
+                    
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="text-warning fs-5">★★★★★</div>
+                        <span class="text-muted" style="font-size: 13px;">4.9 | 120 Customer Ratings &amp; Reviews</span>
+                    </div>
 
-            </table>
+                    <hr class="my-3">
 
-            <!-- Buttons -->
-            <div class="mt-3">
+                    <!-- Pricing Info -->
+                    {% set mrp = (medicine.standard_rate * 1.25)|round(2) %}
+                    <div class="mb-4">
+                        <div class="text-muted small mb-1">Deal of the Day:</div>
+                        <div class="d-flex align-items-baseline gap-3">
+                            <span class="text-dark fw-extrabold fs-2">₹{{ medicine.standard_rate }}</span>
+                            <span class="text-muted text-decoration-line-through fs-6">MRP: ₹{{ mrp }}</span>
+                            <span class="text-success fw-bold fs-5">Save 20%</span>
+                        </div>
+                        <div class="text-muted small mt-1">Inclusive of all local taxes. Standard rate list applies.</div>
+                    </div>
 
-                {% if medicine.available_stock > 0 %}
+                    <!-- E-Commerce Trust Badges (Amazon Style) -->
+                    <div class="border rounded p-3 mb-4 bg-light d-flex justify-content-around text-center">
+                        <div class="small">
+                            <div class="fs-4 mb-1">🛡️</div>
+                            <div class="fw-semibold">Genuine Drug</div>
+                        </div>
+                        <div class="small">
+                            <div class="fs-4 mb-1">📦</div>
+                            <div class="fw-semibold">Safe Packaged</div>
+                        </div>
+                        <div class="small">
+                            <div class="fs-4 mb-1">🚚</div>
+                            <div class="fw-semibold">Fast Shipping</div>
+                        </div>
+                    </div>
 
-                    <a href="/cart?item={{ medicine.name }}"
-                       class="btn btn-primary">
-                        🛒 Add to Cart
-                    </a>
+                    <!-- Action CTAs -->
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        {% if medicine.available_stock > 0 %}
+                            <a href="/add_to_cart?item={{ medicine.name }}"
+                               class="btn btn-warning btn-lg px-5 py-3 rounded-3 shadow-md" style="font-size: 16px;">
+                                🛒 Add to Shopping Cart
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary btn-lg px-5 py-3 rounded-3" disabled>
+                                ❌ Temporarily Out of Stock
+                            </button>
+                        {% endif %}
+                        
+                        <a href="/medicines" class="btn btn-outline-primary btn-lg px-4 py-3 rounded-3">
+                            ⬅ Back to List
+                        </a>
+                    </div>
 
-                {% else %}
+                    <!-- Detailed Specifications Sheet -->
+                    <h5 class="fw-bold text-dark mt-4 mb-2">Specifications &amp; Details</h5>
+                    <table class="table product-spec-table table-borderless">
+                        <tr>
+                            <th class="py-2.5">Item Code</th>
+                            <td class="py-2.5">{{ medicine.item_code }}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2.5">Unit of Measure (UOM)</th>
+                            <td class="py-2.5">{{ medicine.stock_uom }}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2.5">Available Stock</th>
+                            <td class="py-2.5">{{ medicine.available_stock|int }} units remaining</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2.5">Product Description</th>
+                            <td class="py-2.5 text-muted">{{ medicine.description or "No description provided for this medicine. Consult your pharmacist or physician." }}</td>
+                        </tr>
+                    </table>
 
-                    <button class="btn btn-secondary" disabled>
-                        ❌ Out of Stock
-                    </button>
-
-                {% endif %}
-
-                <a href="/medicines"
-                   class="btn btn-secondary">
-                    ⬅ Back
-                </a>
+                </div>
 
             </div>
 
         </div>
-
     </div>
 
 </div>
+
+<!-- ================= Footer Section ================= -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand pharmacy-brand mb-3" href="/home">
+                    <span class="pharmacy-brand-icon">🏥</span>
+                    <span>Hospital Pharmacy</span>
+                </a>
+                <p class="mt-2 text-muted-50">Providing smart, secure, and fast healthcare management solutions. Easily order medicines, view reports, and manage supplies online.</p>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Useful Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/home">Home</a></li>
+                    <li class="mb-2"><a href="/medicines">Browse Medicines</a></li>
+                    <li class="mb-2"><a href="/cart_view">Shopping Cart</a></li>
+                    <li class="mb-2"><a href="/my_orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Emergency Care</h5>
+                <p class="mb-2">📞 Helpline: +91 1800-456-7890</p>
+                <p class="mb-2">✉️ Email: support@hospitalpharmacy.com</p>
+                <p>📍 Location: Block-B, City General Hospital Complex</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0">&copy; 2026 Hospital Pharmacy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
 {% endblock %}

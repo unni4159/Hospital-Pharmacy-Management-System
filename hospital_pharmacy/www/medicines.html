@@ -6,128 +6,139 @@
 
 <div class="container mt-5">
 
-    <h1 class="text-center mb-4">💊 Available Medicines</h1>
+    <div class="text-center mb-4">
+        <h1 class="fw-bold text-dark mb-2">💊 Available Medicines</h1>
+        <p class="text-muted">Browse or search our authentic pharmaceutical inventory</p>
+    </div>
 
-    <!-- Search -->
-    <form method="GET" class="mb-4">
-        <div class="input-group">
-
-            <input
-                type="text"
-                name="search"
-                class="form-control"
-                placeholder="Search medicines..."
-                value="{{ search }}">
-
-            <button class="btn btn-primary" type="submit">
-                🔍 Search
-            </button>
-
-            <a href="/medicines" class="btn btn-secondary">
-                Reset
-            </a>
-
-        </div>
-    </form>
-
-    <div class="row">
-
-        {% for medicine in medicines %}
-
-        <div class="col-md-4 mb-4">
-
-            <div class="card shadow h-100">
-
-                {% if medicine.image %}
-                    <img src="{{ medicine.image }}"
-                         class="card-img-top"
-                         style="height:220px;object-fit:cover;">
-                {% else %}
-                    <img src="https://via.placeholder.com/300x220?text=Medicine"
-                         class="card-img-top"
-                         style="height:220px;object-fit:cover;">
-                {% endif %}
-
-                <div class="card-body">
-
-                    <h4>{{ medicine.item_name }}</h4>
-
-                    <hr>
-
-                    <p>
-                        <strong>Item Code:</strong>
-                        {{ medicine.item_code }}
-                    </p>
-
-                    <p>
-                        <strong>Unit:</strong>
-                        {{ medicine.stock_uom }}
-                    </p>
-
-                    <p>
-                        <strong>Price:</strong>
-                        ₹ {{ medicine.standard_rate }}
-                    </p>
-
-                    <p>
-                        <strong>Available Stock:</strong>
-
-                        {% if medicine.available_stock > 0 %}
-                            <span class="badge bg-success">
-                                In Stock ({{ medicine.available_stock }})
-                            </span>
-                        {% else %}
-                            <span class="badge bg-danger">
-                                Out of Stock
-                            </span>
-                        {% endif %}
-                    </p>
-
-                    <div class="d-grid gap-2">
-
-                        <a href="/medicine?name={{ medicine.name }}"
-                           class="btn btn-success">
-                            👁 View Details
+    <!-- Search Form (Redesigned E-Commerce Style) -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 col-md-8 col-lg-6">
+            <form method="GET" action="/medicines">
+                <div class="nav-search-group">
+                    <input
+                        type="text"
+                        name="search"
+                        class="nav-search-input"
+                        placeholder="Search medicines, health care brands..."
+                        value="{{ search or '' }}">
+                    {% if search %}
+                        <a href="/medicines" class="text-decoration-none text-muted d-flex align-items-center justify-content-center px-3" title="Clear Search" style="font-size: 16px; hover: { color: #ef4444; }">
+                            ✕
                         </a>
+                    {% endif %}
+                    <button class="nav-search-button px-4" type="submit">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                        {% if medicine.available_stock > 0 %}
-
-                            <a href="/cart?item={{ medicine.name }}"
-                               class="btn btn-primary">
-                                🛒 Add to Cart
-                            </a>
-
-                        {% else %}
-
-                            <button
-                                class="btn btn-secondary"
-                                disabled
-                                title="This medicine is currently unavailable">
-                                ❌ Out of Stock
-                            </button>
-
-                        {% endif %}
-
-                    </div>
-
+    <div class="row g-4">
+        {% for medicine in medicines %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="medicine-card">
+                <div class="medicine-card-img-wrapper">
+                    {% if medicine.image %}
+                        <img src="{{ medicine.image }}" alt="{{ medicine.item_name }}">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=60" alt="{{ medicine.item_name }}">
+                    {% endif %}
+                    
+                    {% if medicine.available_stock <= 0 %}
+                        <span class="medicine-card-badge bg-danger text-white">Out of Stock</span>
+                    {% else %}
+                        <span class="medicine-card-badge bg-success text-white">In Stock ({{ medicine.available_stock|int }})</span>
+                    {% endif %}
                 </div>
 
+                <div class="medicine-card-body">
+                    <h4 class="medicine-card-title">{{ medicine.item_name }}</h4>
+
+                    <!-- Star rating indicator -->
+                    <div class="medicine-card-rating">
+                        <span>★★★★★</span>
+                        <span class="text-muted" style="font-size: 11px;">(4.7)</span>
+                    </div>
+
+                    <!-- Price layout standard selling vs mock MRP -->
+                    {% if medicine.discount_percentage %}
+                        <div class="medicine-card-price-row">
+                            <span class="price-actual">₹{{ medicine.discounted_rate|round(2) }}</span>
+                            <span class="price-mrp">₹{{ medicine.standard_rate|round(2) }}</span>
+                            <span class="price-discount">{{ medicine.discount_percentage|int }}% OFF</span>
+                        </div>
+                    {% else %}
+                        {% set mrp = (medicine.standard_rate * 1.25)|round(2) %}
+                        <div class="medicine-card-price-row">
+                            <span class="price-actual">₹{{ medicine.standard_rate }}</span>
+                            <span class="price-mrp">₹{{ mrp }}</span>
+                            <span class="price-discount">20% OFF</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid mt-auto gap-2">
+                        {% if medicine.available_stock > 0 %}
+                            <a href="/add_to_cart?item={{ medicine.name }}" class="btn btn-warning">
+                                🛒 Add to Cart
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>
+                                Out of Stock
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-
         </div>
-
         {% endfor %}
-
     </div>
 
     {% if medicines|length == 0 %}
-
-    <div class="alert alert-warning text-center mt-4">
-        No medicines found.
+    <div class="alert alert-warning text-center mt-5 py-4">
+        <div class="fs-1 mb-2">🔍</div>
+        <h5>No medicines found matching your search.</h5>
+        <p class="text-muted mb-3">Try checking spelling or browsing other categories.</p>
+        <a href="/medicines" class="btn btn-primary">
+            Clear Search
+        </a>
     </div>
-
     {% endif %}
 
 </div>
+
+<!-- ================= Footer Section ================= -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand pharmacy-brand mb-3" href="/home">
+                    <span class="pharmacy-brand-icon">🏥</span>
+                    <span>Hospital Pharmacy</span>
+                </a>
+                <p class="mt-2 text-muted-50">Providing smart, secure, and fast healthcare management solutions. Easily order medicines, view reports, and manage supplies online.</p>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Useful Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/home">Home</a></li>
+                    <li class="mb-2"><a href="/medicines">Browse Medicines</a></li>
+                    <li class="mb-2"><a href="/cart_view">Shopping Cart</a></li>
+                    <li class="mb-2"><a href="/my_orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-4">
+                <h5>Emergency Care</h5>
+                <p class="mb-2">📞 Helpline: +91 1800-456-7890</p>
+                <p class="mb-2">✉️ Email: support@hospitalpharmacy.com</p>
+                <p>📍 Location: Block-B, City General Hospital Complex</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0">&copy; 2026 Hospital Pharmacy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
 {% endblock %}

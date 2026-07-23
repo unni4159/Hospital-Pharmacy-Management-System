@@ -1,7 +1,23 @@
 import frappe
 
 
+no_cache = 1
+
+
 def get_context(context):
+    if frappe.session.user == "Guest":
+        frappe.local.response["type"] = "redirect"
+        item_code = frappe.form_dict.get("item")
+        if item_code:
+            frappe.local.response["location"] = f"/login?redirect-to=/cart?item={item_code}"
+        else:
+            frappe.local.response["location"] = "/login"
+        context.user = "Guest"
+        context.selected_item = item_code
+        context.medicine = None
+        context.error = None
+        context.cart = None
+        return context
 
     # Logged in user
     context.user = frappe.session.user
@@ -47,21 +63,16 @@ def get_context(context):
     else:
         context.error = "No medicine selected."
 
-    # Load current user's open shopping cart
+    # Load the logged-in customer's active draft quotation.  The template
+    # keeps the existing `cart` context name, so its layout and actions do
+    # not need to change while the data source is now Quotation -> items.
     context.cart = None
 
     if frappe.session.user != "Guest":
+        from hospital_pharmacy.api import get_active_quotation, get_customer
 
-        cart_name = frappe.db.get_value(
-            "Shopping Cart",
-            {
-                "user": frappe.session.user,
-                "status": "Open"
-            },
-            "name"
-        )
-
-        if cart_name:
-            context.cart = frappe.get_doc("Shopping Cart", cart_name)
+        customer = get_customer(frappe.session.user)
+        if customer:
+            context.cart = get_active_quotation(customer)
 
     return context

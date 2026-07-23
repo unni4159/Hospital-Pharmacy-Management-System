@@ -1,0 +1,1630 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+{% include "hospital_pharmacy/templates/navbar.html" %}
+
+<style>
+/* Dashboard Styles */
+.order-tracking-dashboard {
+    min-height: calc(100vh - 80px);
+    background-color: var(--body-bg);
+}
+
+.sidebar-card {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.sidebar-card .nav-link {
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: var(--transition-smooth);
+    padding: 12px 16px;
+    text-align: left;
+}
+
+.sidebar-card .nav-link:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.sidebar-card .nav-link.active {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+}
+
+.tracking-card {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Timeline component */
+.progress-tracker {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.progress-tracker::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background-color: #f1f5f9;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.progress-tracker-bar {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    transform: translateY(-50%);
+    z-index: 2;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step-item {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.step-marker {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    border: 3px solid #cbd5e1;
+    transition: var(--transition-smooth);
+}
+
+.step-item.active .step-marker {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.2);
+}
+
+.step-item.completed .step-marker {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.step-label {
+    position: absolute;
+    top: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    text-align: center;
+    transition: var(--transition-smooth);
+}
+
+.step-item.active .step-label,
+.step-item.completed .step-label {
+    color: var(--text-primary);
+}
+
+/* Vertical timeline */
+.timeline-list {
+    position: relative;
+    padding-left: 32px;
+}
+
+.timeline-list::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15px;
+    width: 2px;
+    background-color: var(--border-color);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -23px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #cbd5e1;
+    border: 2px solid #ffffff;
+    z-index: 2;
+}
+
+.timeline-item.active::before {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+.timeline-item.completed::before {
+    background-color: var(--primary-color);
+}
+
+.timeline-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.timeline-content {
+    background-color: #f8fafc;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-top: 4px;
+}
+
+/* SVG map animation */
+.delivery-map-svg {
+    width: 100%;
+    height: 150px;
+    background: #f8fafc;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.pulse-circle {
+    animation: mapPulse 2s infinite;
+}
+
+@keyframes mapPulse {
+    0% { r: 12px; opacity: 0.3; }
+    50% { r: 20px; opacity: 0; }
+    100% { r: 12px; opacity: 0.3; }
+}
+
+/* Admin Widget Card styles */
+.kpi-card {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    padding: 16px;
+    transition: var(--transition-smooth);
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.kpi-icon {
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dark mode theme variables */
+.dark-mode-override {
+    --body-bg: #0f172a;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --card-bg: #1e293b;
+}
+
+.dark-mode-override .sidebar-card,
+.dark-mode-override .tracking-card,
+.dark-mode-override .kpi-card,
+.dark-mode-override .modal-content {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+.dark-mode-override .timeline-content {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+.dark-mode-override .table,
+.dark-mode-override .table th,
+.dark-mode-override .table td {
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+.dark-mode-override input,
+.dark-mode-override select,
+.dark-mode-override textarea {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* Skeletons */
+.skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+}
+
+@keyframes skeletonLoading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1100;
+}
+
+/* Amazon-style vertical progress tracker */
+.amazon-tracker-wrapper {
+    margin: 30px 0;
+    padding: 10px;
+}
+
+.amazon-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding-left: 0;
+}
+
+.timeline-vertical-line {
+    position: absolute;
+    left: 23px;
+    top: 12px;
+    bottom: 12px;
+    width: 4px;
+    background-color: #cbd5e1;
+    z-index: 1;
+    border-radius: 2px;
+}
+
+.timeline-vertical-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #0d9488; /* Premium Teal */
+    z-index: 2;
+    height: 0%;
+    transition: height 0.8s ease;
+    border-radius: 2px;
+}
+
+.amazon-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+    z-index: 3;
+}
+
+.amazon-step .step-icon-container {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border-radius: 50%;
+    margin-left: 13px;
+    position: relative;
+    z-index: 4;
+}
+
+.amazon-step.upcoming .step-icon {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #cbd5e1;
+    background-color: #ffffff;
+    border-radius: 2px; /* Square outline like Amazon */
+}
+
+.amazon-step.active .step-icon {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #0d9488;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2);
+    animation: pulse-teal 2s infinite;
+}
+
+.amazon-step.completed .step-icon {
+    width: 24px;
+    height: 24px;
+    background-color: #0d9488;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+}
+
+.amazon-step.completed .step-icon::before {
+    content: "✓";
+    font-weight: 900;
+}
+
+.amazon-step .step-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.amazon-step .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #475569;
+    transition: color 0.3s ease;
+}
+
+.amazon-step.completed .step-title,
+.amazon-step.active .step-title {
+    color: #0f172a;
+}
+
+.amazon-step .step-date {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.amazon-step .see-all-updates-link {
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+.amazon-step .see-all-updates-link a {
+    color: #0d9488;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.amazon-step .see-all-updates-link a:hover {
+    text-decoration: underline;
+}
+
+/* Dark mode overrides for timeline */
+.dark-mode-override .timeline-vertical-line {
+    background-color: #334155;
+}
+
+.dark-mode-override .amazon-step .step-icon-container {
+    background-color: #1e293b;
+}
+
+.dark-mode-override .amazon-step.upcoming .step-icon {
+    border-color: #475569;
+    background-color: #1e293b;
+}
+
+.dark-mode-override .amazon-step.active .step-icon {
+    background-color: #1e293b;
+}
+
+.dark-mode-override .amazon-step .step-title {
+    color: #94a3b8;
+}
+
+.dark-mode-override .amazon-step.completed .step-title,
+.dark-mode-override .amazon-step.active .step-title {
+    color: #f8fafc;
+}
+
+.dark-mode-override .amazon-step .step-date {
+    color: #94a3b8;
+}
+
+@keyframes pulse-teal {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(13, 148, 136, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+    }
+}
+</style>
+
+<div class="order-tracking-dashboard py-5" id="mainDashboardWrapper">
+    <div class="container-fluid px-md-5">
+        
+        <!-- Header row with Title -->
+        <div class="d-flex align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-slate-800" id="dashTitle">Order Tracking System</h2>
+                <p class="text-muted mb-0">Track shipments and logistics status updates in real time.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Sidebar Panel -->
+            <div class="col-12 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 sidebar-card">
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <button class="nav-link active d-flex align-items-center gap-2 mb-2" id="v-pills-track-tab" data-bs-toggle="pill" data-bs-target="#v-pills-track" type="button" role="tab" onclick="switchTab('track')">
+                            📦 <span>Track Order</span>
+                        </button>
+                        {% if is_admin %}
+                        <button class="nav-link d-flex align-items-center gap-2 mb-2" id="v-pills-admin-tab" data-bs-toggle="pill" data-bs-target="#v-pills-admin" type="button" role="tab" onclick="switchTab('admin')">
+                            ⚙️ <span>Admin Portal</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Panel -->
+            <div class="col-12 col-lg-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                    
+                    <!-- Track Order Tab -->
+                    <div class="tab-pane fade show active" id="v-pills-track" role="tabpanel">
+                        <!-- Search Box Card -->
+                        <div class="card tracking-card p-4 mb-4">
+                            <h5 class="fw-bold mb-3">Lookup Your Shipment</h5>
+                            <form onsubmit="performOrderLookup(event)">
+                                <div class="row g-3">
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control rounded-pill px-4 py-3" id="orderSearchInput" required placeholder="Enter Order ID, Tracking Number, Email, or Phone...">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="submit" class="btn btn-teal w-100 rounded-pill py-3" id="btnSearchLookup">
+                                            🔍 Search Order
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {% if orders %}
+                        <!-- Recent Trackable Orders Card -->
+                        <div class="card tracking-card p-4 mb-4" id="recentOrdersSection">
+                            <h5 class="fw-bold mb-3">📦 Your Trackable Orders</h5>
+                            <div class="table-responsive">
+                                <table class="table mb-0 align-middle">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <th class="ps-3" style="color: var(--text-primary) !important; font-weight: 700;">Invoice No</th>
+                                            <th style="color: var(--text-primary) !important; font-weight: 700;">Medicines</th>
+                                            <th class="text-end pe-3" style="color: var(--text-primary) !important; font-weight: 700;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                        <tr>
+                                            <td class="ps-3 fw-bold text-dark">{{ order.name }}</td>
+                                            <td>
+                                                <div class="d-flex flex-column gap-2">
+                                                    {% for item in order.order_items %}
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <img src="{{ item.image or '/assets/hospital_pharmacy/images/placeholder.png' }}" alt="{{ item.item_name }}" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
+                                                        <span class="small fw-bold text-slate-700" style="font-size: 13px;">{{ item.item_name }}</span>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <button class="btn btn-sm btn-teal px-3 py-1.5" onclick="quickTrackOrder('{{ order.name }}')">
+                                                    🚚 Track
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Skeleton Loader -->
+                        <div id="skeletonLoader" class="d-none">
+                            <div class="card tracking-card p-4 mb-4">
+                                <div class="skeleton mb-3" style="height: 32px; width: 40%; border-radius: 8px;"></div>
+                                <div class="skeleton mb-4" style="height: 20px; width: 60%; border-radius: 8px;"></div>
+                                <div class="skeleton mb-5" style="height: 40px; border-radius: 20px;"></div>
+                                <div class="row g-3">
+                                    <div class="col-md-6"><div class="skeleton" style="height: 150px; border-radius: 12px;"></div></div>
+                                    <div class="col-md-6"><div class="skeleton" style="height: 150px; border-radius: 12px;"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Container -->
+                        <div id="trackResultContainer" class="d-none">
+                            <!-- Main Tracking Progress -->
+                            <div class="card tracking-card p-4 mb-4">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                                    <div>
+                                        <h4 class="fw-bold text-slate-800 mb-1">Shipment: <span id="lblTrackingNo"></span></h4>
+                                        <p class="text-muted small mb-0">Order Reference ID: <span id="lblOrderId" class="fw-semibold text-teal"></span></p>
+                                    </div>
+                                    <div>
+                                        <span class="badge py-2 px-3 fs-6 rounded-pill" id="lblStatusBadge"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Amazon-Style Header Delivery Message -->
+                                <div class="mb-4">
+                                    <h3 class="fw-extrabold text-slate-800" id="lblDeliveryHeadline"></h3>
+                                </div>
+
+                                <!-- Amazon-Style Progress Tracker Workflow -->
+                                <div class="amazon-tracker-wrapper mb-5">
+                                    <div class="amazon-timeline">
+                                        <div class="timeline-vertical-line">
+                                            <div class="timeline-vertical-line-fill" id="timelineLineFill" style="height: 0%;"></div>
+                                        </div>
+                                        
+                                        <!-- Step 1: Ordered -->
+                                        <div class="amazon-step" id="step-ordered">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Ordered</span>
+                                                <span class="step-date" id="step-ordered-date"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2: Shipped -->
+                                        <div class="amazon-step" id="step-shipped">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Shipped</span>
+                                                <span class="step-date" id="step-shipped-date"></span>
+                                                <span class="see-all-updates-link d-none" id="see-all-updates">
+                                                    <a href="#timelineListContainer" onclick="scrollToHistory(event)">See all updates</a>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 3: Out for Delivery -->
+                                        <div class="amazon-step" id="step-out">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Out for delivery</span>
+                                                <span class="step-date" id="step-out-date"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 4: Delivered -->
+                                        <div class="amazon-step" id="step-delivered">
+                                            <div class="step-icon-container">
+                                                <div class="step-icon"></div>
+                                            </div>
+                                            <div class="step-details">
+                                                <span class="step-title">Delivered</span>
+                                                <span class="step-date" id="step-delivered-date"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Shipment details row -->
+                                <div class="row g-4 mt-3">
+                                    <!-- Map Placeholder -->
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold text-slate-700 mb-2">🚚 Live Route Track</h6>
+                                        <svg viewBox="0 0 400 150" class="delivery-map-svg">
+                                            <defs>
+                                                <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stop-color="#0d9488" />
+                                                    <stop offset="100%" stop-color="#f59e0b" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path d="M 40,110 C 120,40 180,130 260,60 L 360,100" fill="none" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round" />
+                                            <path id="routePath" d="M 40,110 C 120,40 180,130 260,60 L 360,100" fill="none" stroke="url(#routeGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="400" stroke-dashoffset="400" />
+                                            <circle cx="40" cy="110" r="8" fill="#0d9488" />
+                                            <circle cx="360" cy="100" r="8" fill="#f59e0b" />
+                                            <g id="truckIcon">
+                                                <circle cx="0" cy="0" r="14" fill="#0d9488" opacity="0.2" class="pulse-circle" />
+                                                <text x="-8" y="5" font-size="16">🚚</text>
+                                            </g>
+                                        </svg>
+                                        <div class="d-flex justify-content-between mt-2 px-1">
+                                            <span class="small text-muted">Warehouse</span>
+                                            <span class="small fw-semibold text-teal" id="lblDistanceRemaining"></span>
+                                            <span class="small text-muted">Destination</span>
+                                        </div>
+                                    </div>
+                                    <!-- Shipment Stats Card -->
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold text-slate-700 mb-2">Estimated Delivery Info</h6>
+                                        <div class="p-3 bg-light rounded-lg">
+                                            <div class="row g-3">
+                                                <div class="col-6">
+                                                    <span class="small text-muted d-block">Expected Date</span>
+                                                    <span class="fw-bold text-slate-800" id="lblExpectedDate"></span>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="small text-muted d-block">Est. Time</span>
+                                                    <span class="fw-bold text-slate-800" id="lblEstTime"></span>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="small text-muted d-block">Time Remaining</span>
+                                                    <span class="fw-bold text-slate-800" id="lblRemainingTime"></span>
+                                                </div>
+                                                <div class="col-6">
+                                                    <span class="small text-muted d-block">Current Location</span>
+                                                    <span class="fw-bold text-teal" id="lblCurrentLoc"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Customer & Delivery Agent Info -->
+                            <div class="card tracking-card p-4 mb-4">
+                                <div class="row g-4">
+                                    <div class="col-md-6 border-end">
+                                        <h6 class="fw-bold mb-3 text-teal">👤 Customer Information</h6>
+                                        <p class="mb-1"><span class="text-muted">Name:</span> <span class="fw-semibold" id="lblCustName"></span></p>
+                                        <p class="mb-1"><span class="text-muted">Email:</span> <span class="fw-semibold" id="lblCustEmail"></span></p>
+                                        <p class="mb-1"><span class="text-muted">Phone:</span> <span class="fw-semibold" id="lblCustPhone"></span></p>
+                                        <p class="mb-1"><span class="text-muted">Shipping Address:</span> <span class="fw-semibold d-block small" id="lblCustShipping"></span></p>
+                                        <p class="mb-0"><span class="text-muted">Billing Address:</span> <span class="fw-semibold d-block small" id="lblCustBilling"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold mb-3 text-teal">📦 Shipping & Delivery Executive</h6>
+                                        <p class="mb-1"><span class="text-muted">Courier Partner:</span> <span class="fw-semibold" id="lblCourierPartner"></span></p>
+                                        <p class="mb-1"><span class="text-muted">Shipping Method:</span> <span class="fw-semibold" id="lblShippingMethod"></span></p>
+                                        <p class="mb-1"><span class="text-muted">Package Weight:</span> <span class="fw-semibold" id="lblPkgWeight"></span></p>
+                                        <p class="mb-1"><span class="text-muted">Delivery Agent:</span> <span class="fw-semibold text-teal" id="lblAgentName"></span></p>
+                                        <p class="mb-3"><span class="text-muted">Agent Contact:</span> <span class="fw-semibold" id="lblAgentContact"></span></p>
+                                        <div class="d-flex gap-2">
+                                            <a href="" id="btnCallAgent" class="btn btn-sm btn-outline-teal rounded-pill px-3">📞 Call Agent</a>
+                                            <button onclick="contactSupport()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">💬 Contact Support</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notification Logs & Action buttons -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-7">
+                                    <!-- Tracking Timeline Logs -->
+                                    <div class="card tracking-card p-4 h-100">
+                                        <h5 class="fw-bold mb-4">Tracking History & Timeline</h5>
+                                        <div class="timeline-list" id="timelineListContainer">
+                                            <!-- Dynamically injected -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <!-- Actions Panel -->
+                                    <div class="card tracking-card p-4 h-100">
+                                        <h5 class="fw-bold mb-3">Order Actions</h5>
+                                        <div class="d-grid gap-3">
+                                            <button onclick="downloadPDFInvoice()" class="btn btn-teal w-100 rounded-pill py-2">📥 Download Invoice PDF</button>
+                                            <button onclick="printOrderInvoice()" class="btn btn-outline-teal w-100 rounded-pill py-2">🖨️ Print Invoice</button>
+                                            <button onclick="openDeliveryIssueModal()" class="btn btn-outline-warning w-100 rounded-pill py-2">⚠️ Raise Delivery Issue</button>
+                                            <button id="btnCancelOrder" onclick="cancelOrder()" class="btn btn-outline-danger w-100 rounded-pill py-2 d-none">❌ Cancel Order</button>
+                                            <button id="btnReturnOrder" onclick="returnOrder()" class="btn btn-outline-secondary w-100 rounded-pill py-2 d-none">↩️ Return Order</button>
+                                        </div>
+
+                                        <h6 class="fw-bold mt-4 mb-2">Notification Milestones</h6>
+                                        <ul class="list-group list-group-flush small" id="notificationsList">
+                                            <!-- Injected -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Summary -->
+                            <div class="card tracking-card p-4 mb-5">
+                                <h5 class="fw-bold mb-3">Order Summary & Items</h5>
+                                <div class="table-responsive">
+                                    <table class="table align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>SKU</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Price</th>
+                                                <th>Discount</th>
+                                                <th>Tax</th>
+                                                <th class="text-end">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="orderSummaryTableBody">
+                                            <!-- Dynamically injected -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Portal Tab -->
+                    <div class="tab-pane fade" id="v-pills-admin" role="tabpanel">
+                        <!-- KPI Widgets Row -->
+                        <div class="row g-3 mb-4" id="kpiWidgetsRow">
+                            <!-- Dynamically loaded admin KPI cards -->
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Total Orders</span>
+                                    <h3 class="fw-bold mb-0 text-dark" id="kpiTotal">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Pending</span>
+                                    <h3 class="fw-bold mb-0 text-warning" id="kpiPending">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Shipped</span>
+                                    <h3 class="fw-bold mb-0 text-info" id="kpiShipped">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Success Rate</span>
+                                    <h3 class="fw-bold mb-0 text-success" id="kpiSuccess">0%</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Widgets row -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Out for Delivery</span>
+                                    <h3 class="fw-bold mb-0 text-primary" id="kpiOut">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Delivered</span>
+                                    <h3 class="fw-bold mb-0 text-teal" id="kpiDelivered">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Cancelled</span>
+                                    <h3 class="fw-bold mb-0 text-danger" id="kpiCancelled">0</h3>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="kpi-card text-center">
+                                    <span class="d-block text-muted small">Avg Delivery Time</span>
+                                    <h3 class="fw-bold mb-0 text-secondary" id="kpiAvgTime">0 Days</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters Panel -->
+                        <div class="card tracking-card p-4 mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control rounded-pill px-3" id="adminSearchInput" placeholder="Search by Order ID..." oninput="loadAdminOrders()">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select rounded-pill" id="adminStatusSelect" onchange="loadAdminOrders()">
+                                        <option value="">All Statuses</option>
+                                        <option value="Order Placed">Order Placed</option>
+                                        <option value="Order Confirmed">Order Confirmed</option>
+                                        <option value="Processing">Processing</option>
+                                        <option value="Packed">Packed</option>
+                                        <option value="Ready to Ship">Ready to Ship</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="In Transit">In Transit</option>
+                                        <option value="Arrived at Local Hub">Arrived at Local Hub</option>
+                                        <option value="Out for Delivery">Out for Delivery</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Returned">Returned</option>
+                                        <option value="Refunded">Refunded</option>
+                                        <option value="Delivery Failed">Delivery Failed</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select rounded-pill" id="adminCourierSelect" onchange="loadAdminOrders()">
+                                        <option value="">All Couriers</option>
+                                        <option value="Express Logistics">Express Logistics</option>
+                                        <option value="DHL Express">DHL Express</option>
+                                        <option value="FedEx">FedEx</option>
+                                        <option value="Speed Post">Speed Post</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Orders List Card -->
+                        <div class="card tracking-card p-0 mb-5 overflow-hidden">
+                            <div class="table-responsive">
+                                <table class="table mb-0 align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4">Order ID</th>
+                                            <th>Tracking No</th>
+                                            <th>Customer</th>
+                                            <th>Courier Partner</th>
+                                            <th>Status</th>
+                                            <th>Last Updated</th>
+                                            <th class="text-end pe-4">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminOrdersTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination -->
+                            <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light">
+                                <span class="small text-muted" id="adminPaginationText">Showing 0 of 0 orders</span>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="adminPrevPage()" id="btnAdminPrev">Previous</button>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="adminNextPage()" id="btnAdminNext">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Support / Issue modal -->
+<div class="modal fade" id="deliveryIssueModal" tabindex="-1" aria-hidden="true" style="z-index: 1080;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-lg border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="fw-bold mb-0">Raise Delivery Issue</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="deliveryIssueForm" onsubmit="submitDeliveryIssue(event)">
+                    <input type="hidden" id="issueOrderName">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Issue Subject</label>
+                        <select class="form-select rounded-pill" id="issueSubjectInput" required>
+                            <option value="Delayed Delivery">Delayed Delivery</option>
+                            <option value="Damaged Shipment">Damaged Shipment</option>
+                            <option value="Incorrect Items">Incorrect Items</option>
+                            <option value="Package Not Received">Package Not Received</option>
+                            <option value="Other Logistics Issue">Other Logistics Issue</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Description / Remarks</label>
+                        <textarea class="form-control" id="issueDescriptionInput" rows="3" required placeholder="Please describe the issue in detail..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-teal w-100 rounded-pill">Submit Ticket</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Update Modal -->
+<div class="modal fade" id="adminUpdateModal" tabindex="-1" aria-hidden="true" style="z-index: 1080;">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-lg border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="fw-bold mb-0">Update Logistics: <span id="adminModalOrderTitle" class="text-teal"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="adminUpdateForm" onsubmit="submitAdminUpdate(event)">
+                    <input type="hidden" id="adminModalOrderName">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Order Shipment Status</label>
+                            <select class="form-select rounded-pill" id="adminModalStatus" required>
+                                <option value="Order Placed">Order Placed</option>
+                                <option value="Order Confirmed">Order Confirmed</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Packed">Packed</option>
+                                <option value="Ready to Ship">Ready to Ship</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="In Transit">In Transit</option>
+                                <option value="Arrived at Local Hub">Arrived at Local Hub</option>
+                                <option value="Out for Delivery">Out for Delivery</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Returned">Returned</option>
+                                <option value="Refunded">Refunded</option>
+                                <option value="Delivery Failed">Delivery Failed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Courier Partner</label>
+                            <input type="text" class="form-control rounded-pill" id="adminModalCourier">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Delivery Executive Name</label>
+                            <input type="text" class="form-control rounded-pill" id="adminModalExecName">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Delivery Executive Contact</label>
+                            <input type="text" class="form-control rounded-pill" id="adminModalExecContact">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Current Shipment Location</label>
+                            <input type="text" class="form-control rounded-pill" id="adminModalLocation">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Expected Delivery Date</label>
+                            <input type="date" class="form-control rounded-pill" id="adminModalExpectedDate">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Shipping Method</label>
+                            <input type="text" class="form-control rounded-pill" id="adminModalShippingMethod">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Package Weight</label>
+                            <input type="text" class="form-control rounded-pill" id="adminModalWeight">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Distance Remaining</label>
+                            <input type="text" class="form-control rounded-pill" id="adminModalDistance" placeholder="e.g. 5.4 km">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Logistics Update Remarks</label>
+                            <textarea class="form-control" id="adminModalRemarks" rows="2" placeholder="Enter remarks to log in timeline..."></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-teal w-100 rounded-pill mt-4 py-2">Save Status Updates</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notifications -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// Active order variable
+let activeOrder = null;
+let adminLimit = 10;
+let adminOffset = 0;
+let adminTotal = 0;
+
+// Theme Toggle
+function toggleTheme() {
+    globalToggleTheme();
+}
+
+// Show Toast message helper
+function showToast(message, type = "success") {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast show align-items-center text-white border-0 p-3 rounded-lg mb-2 ${type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-success'}`;
+    toast.role = 'alert';
+    toast.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="toast-body py-0 fw-semibold">${message}</div>
+            <button type="button" class="btn-close btn-close-white" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
+
+// Switch tabs and load data
+function switchTab(tab) {
+    if (tab === 'admin') {
+        loadAdminDashboard();
+        loadAdminOrders();
+    }
+}
+
+// Quick track an order from the list
+function quickTrackOrder(orderId) {
+    const input = document.getElementById('orderSearchInput');
+    if (input) {
+        input.value = orderId;
+        performOrderLookup();
+    }
+}
+
+// Perform client-side order lookup
+function performOrderLookup(event) {
+    if (event) event.preventDefault();
+    const query = document.getElementById('orderSearchInput').value;
+    if (!query) return;
+
+    // Show skeleton and hide results
+    document.getElementById('skeletonLoader').classList.remove('d-none');
+    document.getElementById('trackResultContainer').classList.add('d-none');
+
+    frappe.call({
+        method: "hospital_pharmacy.api.search_track_order",
+        args: { search_query: query },
+        callback: function(r) {
+            document.getElementById('skeletonLoader').classList.add('d-none');
+            if (r.message) {
+                activeOrder = r.message;
+                renderOrderTracking(r.message);
+                
+                // Scroll smoothly to results card
+                setTimeout(() => {
+                    const resultContainer = document.getElementById('trackResultContainer');
+                    if (resultContainer) {
+                        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        },
+        error: function(err) {
+            document.getElementById('skeletonLoader').classList.add('d-none');
+            showToast("Failed to lookup order. Check your input and try again.", "danger");
+        }
+    });
+}
+
+// Date Formatter matching Amazon style
+function formatTimelineDate(dateStr) {
+    if (!dateStr) return "";
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const dayName = days[date.getDay()];
+        const day = date.getDate();
+        const monthName = months[date.getMonth()];
+        
+        return `${dayName}, ${day} ${monthName}`;
+    } catch (e) {
+        return dateStr;
+    }
+}
+
+// Scroll to Detailed History timeline
+function scrollToHistory(event) {
+    if (event) event.preventDefault();
+    const el = document.getElementById('timelineListContainer');
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Render Order Tracking View
+function renderOrderTracking(order) {
+    document.getElementById('trackResultContainer').classList.remove('d-none');
+
+    document.getElementById('lblTrackingNo').innerText = order.tracking_number;
+    document.getElementById('lblOrderId').innerText = order.sales_invoice;
+    
+    // Status Badge
+    const badge = document.getElementById('lblStatusBadge');
+    badge.innerText = order.delivery_status;
+    badge.className = "badge py-2 px-3 fs-6 rounded-pill ";
+    if (["Delivered", "Refunded", "Returned"].includes(order.delivery_status)) {
+        badge.className += "bg-success text-white";
+    } else if (["Cancelled", "Delivery Failed"].includes(order.delivery_status)) {
+        badge.className += "bg-danger text-white";
+    } else {
+        badge.className += "bg-teal text-white";
+    }
+
+    // Map status to Amazon vertical steps
+    // 0: Ordered, 1: Shipped, 2: Out for Delivery, 3: Delivered
+    let activeStepIndex = 0;
+    const status = order.delivery_status;
+    
+    if (["Delivered", "Refunded", "Returned"].includes(status)) {
+        activeStepIndex = 3;
+    } else if (status === "Out for Delivery") {
+        activeStepIndex = 2;
+    } else if (["Packed", "Ready to Ship", "Shipped", "In Transit", "Arrived at Local Hub", "Reached Local Hub"].includes(status)) {
+        activeStepIndex = 1;
+    } else {
+        activeStepIndex = 0;
+    }
+
+    // Set vertical fill line height
+    const heights = ["0%", "33%", "66%", "100%"];
+    const fillLine = document.getElementById('timelineLineFill');
+    if (fillLine) {
+        fillLine.style.height = heights[activeStepIndex];
+    }
+
+    // Highlight step classes
+    const stepIds = ["step-ordered", "step-shipped", "step-out", "step-delivered"];
+    stepIds.forEach((stepId, index) => {
+        const el = document.getElementById(stepId);
+        if (el) {
+            if (index < activeStepIndex) {
+                el.className = "amazon-step completed";
+            } else if (index === activeStepIndex) {
+                el.className = "amazon-step active";
+            } else {
+                el.className = "amazon-step upcoming";
+            }
+        }
+    });
+
+    // Populate timeline dates from tracking history
+    const orderedTimeline = order.tracking_timeline.find(t => 
+        ["Order Placed", "Pending", "Order Confirmed", "Confirmed", "Processing", "Approved"].includes(t.status)
+    );
+    const shippedTimeline = order.tracking_timeline.find(t => 
+        ["Packed", "Ready to Ship", "Shipped", "In Transit", "Arrived at Local Hub", "Reached Local Hub"].includes(t.status)
+    );
+    const outTimeline = order.tracking_timeline.find(t => 
+        ["Out for Delivery"].includes(t.status)
+    );
+    const deliveredTimeline = order.tracking_timeline.find(t => 
+        ["Delivered", "Refunded", "Returned", "Cancelled", "Delivery Failed"].includes(t.status)
+    );
+
+    const orderedDateStr = orderedTimeline ? formatTimelineDate(orderedTimeline.date) : "";
+    const shippedDateStr = shippedTimeline ? formatTimelineDate(shippedTimeline.date) : "";
+    const outDateStr = outTimeline ? formatTimelineDate(outTimeline.date) : "";
+    const deliveredDateStr = deliveredTimeline ? formatTimelineDate(deliveredTimeline.date) : "";
+
+    document.getElementById('step-ordered-date').innerText = orderedDateStr;
+    document.getElementById('step-shipped-date').innerText = shippedDateStr;
+    document.getElementById('step-out-date').innerText = outDateStr;
+    
+    // For delivered date: if not delivered yet, show the expected delivery date!
+    const deliveredLabel = document.getElementById('step-delivered-date');
+    if (deliveredDateStr) {
+        deliveredLabel.innerText = deliveredDateStr;
+    } else if (order.expected_delivery_date) {
+        deliveredLabel.innerText = "Arriving " + formatTimelineDate(order.expected_delivery_date);
+    } else {
+        deliveredLabel.innerText = "Pending delivery";
+    }
+
+    // Toggle "See all updates" link under active step
+    const seeAllUpdates = document.getElementById('see-all-updates');
+    if (seeAllUpdates) {
+        if (activeStepIndex >= 1 && activeStepIndex < 3) {
+            seeAllUpdates.classList.remove('d-none');
+        } else {
+            seeAllUpdates.classList.add('d-none');
+        }
+    }
+
+    // Set Amazon-style delivery message header text
+    const headline = document.getElementById('lblDeliveryHeadline');
+    if (headline) {
+        headline.className = "fw-extrabold text-slate-800 mb-0";
+        if (status === "Delivered") {
+            headline.innerText = "Delivered " + (deliveredDateStr || formatTimelineDate(order.expected_delivery_date) || "");
+        } else if (status === "Out for Delivery") {
+            headline.innerText = "Arriving today by 9 PM";
+        } else if (status === "Cancelled") {
+            headline.innerText = "Cancelled";
+            headline.className = "fw-extrabold text-danger mb-0";
+        } else if (status === "Returned") {
+            headline.innerText = "Returned";
+            headline.className = "fw-extrabold text-warning mb-0";
+        } else if (status === "Refunded") {
+            headline.innerText = "Refunded";
+            headline.className = "fw-extrabold text-success mb-0";
+        } else if (order.expected_delivery_date) {
+            headline.innerText = "Arriving " + formatTimelineDate(order.expected_delivery_date);
+        } else {
+            headline.innerText = "Order Placed";
+        }
+    }
+
+    // Map truck animation
+    const fractionMap = [0.1, 0.45, 0.8, 1.0];
+    animateTruck(fractionMap[activeStepIndex]);
+    document.getElementById('lblDistanceRemaining').innerText = order.distance_remaining;
+
+    // Dates & Stats
+    document.getElementById('lblExpectedDate').innerText = order.expected_delivery_date;
+    document.getElementById('lblEstTime').innerText = order.estimated_delivery_time;
+    document.getElementById('lblRemainingTime').innerText = order.remaining_delivery_time;
+    document.getElementById('lblCurrentLoc').innerText = order.current_location;
+
+    // Customer
+    document.getElementById('lblCustName').innerText = order.customer_name;
+    document.getElementById('lblCustEmail').innerText = order.customer_name + "@gmail.com";
+    document.getElementById('lblCustPhone').innerText = order.phone_number;
+    document.getElementById('lblCustShipping').innerText = order.delivery_address;
+    document.getElementById('lblCustBilling').innerText = order.billing_address;
+
+    // Shipment details
+    document.getElementById('lblCourierPartner').innerText = order.courier_partner;
+    document.getElementById('lblShippingMethod').innerText = order.shipping_method;
+    document.getElementById('lblPkgWeight').innerText = order.package_weight;
+    document.getElementById('lblAgentName').innerText = order.delivery_executive_name;
+    document.getElementById('lblAgentContact').innerText = order.delivery_executive_contact;
+    document.getElementById('btnCallAgent').href = `tel:${order.delivery_executive_contact}`;
+
+    // Timeline Rendering
+    const timelineContainer = document.getElementById('timelineListContainer');
+    timelineContainer.innerHTML = '';
+    order.tracking_timeline.forEach((item, index) => {
+        const activeClass = index === order.tracking_timeline.length - 1 ? 'active' : 'completed';
+        const div = document.createElement('div');
+        div.className = `timeline-item ${activeClass}`;
+        div.innerHTML = `
+            <div class="d-flex justify-content-between">
+                <span class="fw-bold text-slate-800">${item.status}</span>
+                <span class="timeline-time">${item.date} ${item.time}</span>
+            </div>
+            <div class="timeline-content">
+                <p class="mb-1 small">📍 <strong>Location:</strong> ${item.location} | 👤 <strong>Updated By:</strong> ${item.updated_by}</p>
+                <p class="mb-0 small text-muted">"${item.remarks}"</p>
+            </div>
+        `;
+        timelineContainer.appendChild(div);
+    });
+
+    // Milestone notifications rendering
+    const notifsContainer = document.getElementById('notificationsList');
+    notifsContainer.innerHTML = '';
+    order.notification_history.forEach(item => {
+        const li = document.createElement('li');
+        li.className = "list-group-item d-flex justify-content-between align-items-center bg-transparent py-2 border-0 px-0";
+        li.innerHTML = `
+            <span class="text-slate-700">✔️ ${item.event} Alert Sent</span>
+            <span class="badge bg-light text-muted fw-normal">${item.time}</span>
+        `;
+        notifsContainer.appendChild(li);
+    });
+
+    // Action cancellation / return buttons validation
+    const btnCancel = document.getElementById('btnCancelOrder');
+    const btnReturn = document.getElementById('btnReturnOrder');
+    
+    if (["Order Placed", "Order Confirmed", "Processing"].includes(order.delivery_status)) {
+        btnCancel.classList.remove('d-none');
+    } else {
+        btnCancel.classList.add('d-none');
+    }
+
+    if (order.delivery_status === "Delivered") {
+        btnReturn.classList.remove('d-none');
+    } else {
+        btnReturn.classList.add('d-none');
+    }
+
+    // Items table
+    const tableBody = document.getElementById('orderSummaryTableBody');
+    tableBody.innerHTML = '';
+    order.items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center gap-3">
+                    <img src="${item.image}" alt="${item.item_name}" style="width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius-sm);">
+                    <span class="fw-bold text-slate-800">${item.item_name}</span>
+                </div>
+            </td>
+            <td><code>${item.item_code}</code></td>
+            <td>${parseInt(item.qty)}</td>
+            <td>₹${item.rate}</td>
+            <td>₹${item.discount}</td>
+            <td>₹${item.tax}</td>
+            <td class="text-end fw-bold">₹${item.amount}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+
+    // Grand total row
+    const totalTr = document.createElement('tr');
+    totalTr.className = "bg-light";
+    totalTr.innerHTML = `
+        <td colspan="6" class="text-end fw-bold py-3">Grand Total:</td>
+        <td class="text-end fw-extrabold text-teal py-3 fs-5">₹${order.grand_total}</td>
+    `;
+    tableBody.appendChild(totalTr);
+}
+
+// SVG Truck animation function
+function animateTruck(progressFraction) {
+    const path = document.getElementById('routePath');
+    const truck = document.getElementById('truckIcon');
+    if (!path || !truck) return;
+    const totalLength = path.getTotalLength();
+    
+    // Set dash offset for gradient line
+    path.style.strokeDasharray = totalLength;
+    path.style.strokeDashoffset = totalLength - (totalLength * progressFraction);
+    
+    // Set truck translated position
+    const point = path.getPointAtLength(totalLength * progressFraction);
+    truck.setAttribute('transform', `translate(${point.x}, ${point.y})`);
+}
+
+// Download Invoice PDF
+function downloadPDFInvoice() {
+    if (!activeOrder) return;
+    window.open(`/api/method/frappe.utils.print_format.download_pdf?doctype=Sales+Invoice&name=${activeOrder.sales_invoice}&format=Standard`, '_blank');
+}
+
+// Print invoice
+function printOrderInvoice() {
+    if (!activeOrder) return;
+    window.open(`/printview?doctype=Sales+Invoice&name=${activeOrder.sales_invoice}&format=Standard`, '_blank');
+}
+
+// Support Contact
+function contactSupport() {
+    showToast("Opening live chat support link...", "success");
+    window.open("mailto:support@hospitalpharmacy.com?subject=Delivery Issue Inquiry", "_blank");
+}
+
+// Cancel Order
+function cancelOrder() {
+    if (!activeOrder) return;
+    if (confirm("Are you sure you want to cancel this order?")) {
+        frappe.call({
+            method: "hospital_pharmacy.api.cancel_order_portal",
+            args: { delivery_order_name: activeOrder.name },
+            callback: function(r) {
+                if (r.message && r.message.status === "success") {
+                    showToast("Order successfully cancelled.", "success");
+                    performOrderLookup();
+                }
+            }
+        });
+    }
+}
+
+// Return Order
+function returnOrder() {
+    if (!activeOrder) return;
+    if (confirm("Are you sure you want to return this order?")) {
+        frappe.call({
+            method: "hospital_pharmacy.api.return_order_portal",
+            args: { delivery_order_name: activeOrder.name },
+            callback: function(r) {
+                if (r.message && r.message.status === "success") {
+                    showToast("Return request submitted.", "success");
+                    performOrderLookup();
+                }
+            }
+        });
+    }
+}
+
+// Support Issue Modal
+function openDeliveryIssueModal() {
+    if (!activeOrder) return;
+    document.getElementById('issueOrderName').value = activeOrder.name;
+    const modal = new bootstrap.Modal(document.getElementById('deliveryIssueModal'));
+    modal.show();
+}
+
+function submitDeliveryIssue(event) {
+    event.preventDefault();
+    const name = document.getElementById('issueOrderName').value;
+    const subject = document.getElementById('issueSubjectInput').value;
+    const desc = document.getElementById('issueDescriptionInput').value;
+
+    frappe.call({
+        method: "hospital_pharmacy.api.raise_delivery_issue",
+        args: {
+            delivery_order_name: name,
+            issue_subject: subject,
+            issue_description: desc
+        },
+        callback: function(r) {
+            bootstrap.Modal.getInstance(document.getElementById('deliveryIssueModal')).hide();
+            showToast("Delivery issue raised successfully. Our support team will inspect it.", "success");
+            performOrderLookup();
+        }
+    });
+}
+
+// ==========================================
+// ADMIN PORTAL JS ACTIONS
+// ==========================================
+function loadAdminDashboard() {
+    frappe.call({
+        method: "hospital_pharmacy.api.get_admin_dashboard_stats",
+        callback: function(r) {
+            if (r.message) {
+                const stats = r.message;
+                document.getElementById('kpiTotal').innerText = stats.total_orders;
+                document.getElementById('kpiPending').innerText = stats.pending_orders;
+                document.getElementById('kpiShipped').innerText = stats.shipped_orders;
+                document.getElementById('kpiSuccess').innerText = stats.delivery_success_rate;
+                document.getElementById('kpiOut').innerText = stats.out_for_delivery;
+                document.getElementById('kpiDelivered').innerText = stats.delivered_orders;
+                document.getElementById('kpiCancelled').innerText = stats.cancelled_orders;
+                document.getElementById('kpiAvgTime').innerText = stats.average_delivery_time;
+            }
+        }
+    });
+}
+
+function loadAdminOrders() {
+    const status = document.getElementById('adminStatusSelect').value;
+    const courier = document.getElementById('adminCourierSelect').value;
+    const search = document.getElementById('adminSearchInput').value;
+
+    frappe.call({
+        method: "hospital_pharmacy.api.get_all_delivery_orders_admin",
+        args: {
+            status_filter: status,
+            courier_filter: courier,
+            search_query: search,
+            limit: adminLimit,
+            offset: adminOffset
+        },
+        callback: function(r) {
+            if (r.message) {
+                adminTotal = r.message.total_count;
+                renderAdminOrdersTable(r.message.orders);
+            }
+        }
+    });
+}
+
+function renderAdminOrdersTable(orders) {
+    const body = document.getElementById('adminOrdersTableBody');
+    body.innerHTML = '';
+    
+    if (orders.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No delivery orders found.</td></tr>';
+        document.getElementById('adminPaginationText').innerText = "Showing 0 of 0 orders";
+        return;
+    }
+
+    orders.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="ps-4 fw-bold text-teal">${o.name}</td>
+            <td><code>${o.tracking_number || ''}</code></td>
+            <td>${o.customer}</td>
+            <td>${o.courier_partner || 'Not Assigned'}</td>
+            <td><span class="badge bg-teal rounded-pill px-2 py-1">${o.delivery_status}</span></td>
+            <td>${o.modified.split('.')[0]}</td>
+            <td class="text-end pe-4">
+                <button class="btn btn-sm btn-outline-teal rounded-pill" onclick="openAdminUpdateModal('${o.name}')">✏️ Manage</button>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
+
+    document.getElementById('adminPaginationText').innerText = `Showing ${adminOffset + 1} - ${Math.min(adminOffset + adminLimit, adminTotal)} of ${adminTotal} orders`;
+    document.getElementById('btnAdminPrev').disabled = adminOffset === 0;
+    document.getElementById('btnAdminNext').disabled = adminOffset + adminLimit >= adminTotal;
+}
+
+function adminPrevPage() {
+    if (adminOffset > 0) {
+        adminOffset -= adminLimit;
+        loadAdminOrders();
+    }
+}
+
+function adminNextPage() {
+    if (adminOffset + adminLimit < adminTotal) {
+        adminOffset += adminLimit;
+        loadAdminOrders();
+    }
+}
+
+// Open Admin updater popup
+function openAdminUpdateModal(name) {
+    frappe.call({
+        method: "hospital_pharmacy.api.search_track_order",
+        args: { search_query: name },
+        callback: function(r) {
+            if (r.message) {
+                const o = r.message;
+                document.getElementById('adminModalOrderTitle').innerText = o.name;
+                document.getElementById('adminModalOrderName').value = o.name;
+                document.getElementById('adminModalStatus').value = o.delivery_status;
+                document.getElementById('adminModalCourier').value = o.courier_partner;
+                document.getElementById('adminModalExecName').value = o.delivery_executive_name;
+                document.getElementById('adminModalExecContact').value = o.delivery_executive_contact;
+                document.getElementById('adminModalLocation').value = o.current_location;
+                document.getElementById('adminModalExpectedDate').value = o.expected_delivery_date;
+                document.getElementById('adminModalShippingMethod').value = o.shipping_method;
+                document.getElementById('adminModalWeight').value = o.package_weight;
+                document.getElementById('adminModalDistance').value = o.distance_remaining;
+                document.getElementById('adminModalRemarks').value = '';
+
+                const modal = new bootstrap.Modal(document.getElementById('adminUpdateModal'));
+                modal.show();
+            }
+        }
+    });
+}
+
+function submitAdminUpdate(event) {
+    event.preventDefault();
+    const name = document.getElementById('adminModalOrderName').value;
+    
+    frappe.call({
+        method: "hospital_pharmacy.api.admin_update_order_tracking",
+        args: {
+            delivery_order_name: name,
+            status: document.getElementById('adminModalStatus').value,
+            courier_partner: document.getElementById('adminModalCourier').value,
+            delivery_executive_name: document.getElementById('adminModalExecName').value,
+            delivery_executive_contact: document.getElementById('adminModalExecContact').value,
+            current_location: document.getElementById('adminModalLocation').value,
+            expected_delivery_date: document.getElementById('adminModalExpectedDate').value,
+            shipping_method: document.getElementById('adminModalShippingMethod').value,
+            package_weight: document.getElementById('adminModalWeight').value,
+            distance_remaining: document.getElementById('adminModalDistance').value,
+            remarks: document.getElementById('adminModalRemarks').value
+        },
+        callback: function(r) {
+            bootstrap.Modal.getInstance(document.getElementById('adminUpdateModal')).hide();
+            showToast("Logistics status updated successfully.", "success");
+            loadAdminDashboard();
+            loadAdminOrders();
+            // If active order is being tracked, refresh
+            if (activeOrder && activeOrder.name === name) {
+                performOrderLookup();
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const savedTheme = localStorage.getItem('theme');
+        const wrapper = document.getElementById('mainDashboardWrapper');
+        if (savedTheme === 'dark' && wrapper) {
+            wrapper.classList.add('dark-mode-override');
+        }
+    } catch(e) {}
+
+    // Automatically perform lookup if query is present in URL or context
+    const urlParams = new URLSearchParams(window.location.search);
+    let query = urlParams.get('search_query') || urlParams.get('invoice') || urlParams.get('order_id') || urlParams.get('id');
+    
+    if (!query) {
+        query = "{{ default_order_id or '' }}";
+    }
+
+    if (query && query.trim() !== "") {
+        const searchInput = document.getElementById('orderSearchInput');
+        if (searchInput) {
+            searchInput.value = query;
+            performOrderLookup();
+        }
+    }
+});
+</script>
+
+{% endblock %}

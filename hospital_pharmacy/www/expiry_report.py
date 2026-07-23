@@ -1,4 +1,6 @@
+# pyrefly: ignore [missing-import]
 import frappe
+# pyrefly: ignore [missing-import]
 from frappe.utils import today
 
 

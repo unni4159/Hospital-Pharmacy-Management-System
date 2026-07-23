@@ -10,11 +10,28 @@
   "customer",
   "sales_invoice",
   "delivery_address",
-  "column_break_vlwj",
+  "billing_address",
   "phone_number",
+  "column_break_vlwj",
   "delivery_date",
+  "expected_delivery_date",
   "delivery_status",
-  "delivery_person"
+  "delivery_person",
+  "tracking_section",
+  "tracking_number",
+  "courier_partner",
+  "shipping_method",
+  "package_weight",
+  "col_break_tracking",
+  "delivery_executive_name",
+  "delivery_executive_contact",
+  "current_location",
+  "distance_remaining",
+  "estimated_delivery_time",
+  "remaining_delivery_time",
+  "timeline_section",
+  "tracking_timeline",
+  "notification_history"
  ],
  "fields": [
   {
@@ -67,12 +84,12 @@
    "label": "Delivery Date"
   },
   {
-   "default": "Pending",
+   "default": "Order Placed",
    "fieldname": "delivery_status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Delivery Status",
-   "options": "Pending\nApproved\nPacked\nOut for Delivery\nDelivered\nCancelled",
+   "options": "Pending\nApproved\nOrder Placed\nOrder Confirmed\nProcessing\nPacked\nReady to Ship\nShipped\nIn Transit\nArrived at Local Hub\nOut for Delivery\nDelivered\nCancelled\nReturned\nRefunded\nDelivery Failed",
    "reqd": 1
   },
   {
@@ -80,6 +97,90 @@
    "fieldtype": "Link",
    "label": "Delivery Person",
    "options": "User"
+  },
+  {
+   "fieldname": "billing_address",
+   "fieldtype": "Small Text",
+   "label": "Billing Address"
+  },
+  {
+   "fieldname": "expected_delivery_date",
+   "fieldtype": "Date",
+   "label": "Expected Delivery Date"
+  },
+  {
+   "fieldname": "tracking_section",
+   "fieldtype": "Section Break",
+   "label": "Tracking Details"
+  },
+  {
+   "fieldname": "tracking_number",
+   "fieldtype": "Data",
+   "label": "Tracking Number"
+  },
+  {
+   "fieldname": "courier_partner",
+   "fieldtype": "Data",
+   "label": "Courier/Delivery Partner"
+  },
+  {
+   "fieldname": "shipping_method",
+   "fieldtype": "Data",
+   "label": "Shipping Method"
+  },
+  {
+   "fieldname": "package_weight",
+   "fieldtype": "Data",
+   "label": "Package Weight"
+  },
+  {
+   "fieldname": "col_break_tracking",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "delivery_executive_name",
+   "fieldtype": "Data",
+   "label": "Delivery Executive Name"
+  },
+  {
+   "fieldname": "delivery_executive_contact",
+   "fieldtype": "Data",
+   "label": "Delivery Executive Contact"
+  },
+  {
+   "fieldname": "current_location",
+   "fieldtype": "Data",
+   "label": "Current Location"
+  },
+  {
+   "fieldname": "distance_remaining",
+   "fieldtype": "Data",
+   "label": "Distance Remaining"
+  },
+  {
+   "fieldname": "estimated_delivery_time",
+   "fieldtype": "Data",
+   "label": "Estimated Delivery Time"
+  },
+  {
+   "fieldname": "remaining_delivery_time",
+   "fieldtype": "Data",
+   "label": "Remaining Delivery Time"
+  },
+  {
+   "fieldname": "timeline_section",
+   "fieldtype": "Section Break",
+   "label": "History & Logs"
+  },
+  {
+   "fieldname": "tracking_timeline",
+   "fieldtype": "Long Text",
+   "label": "Tracking Timeline"
+  },
+  {
+   "fieldname": "notification_history",
+   "fieldtype": "Long Text",
+   "label": "Notification History"
   }
  ],
  "grid_page_length": 50,

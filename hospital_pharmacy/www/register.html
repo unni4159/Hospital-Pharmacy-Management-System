@@ -4,69 +4,260 @@
 
 {% include "hospital_pharmacy/templates/navbar.html" %}
 
-<div class="container mt-5">
+<div class="container d-flex align-items-center justify-content-center my-5" style="min-height: 80vh; padding: 40px 20px;">
 
-    <h2>Customer Registration</h2>
-
-    <form id="register-form">
-
-        <div class="mb-3">
-            <label>Customer Name</label>
-            <input type="text" id="customer_name" class="form-control" required>
+    <div class="card border-0 shadow-premium rounded-4 overflow-hidden" style="max-width: 520px; width: 100%; background: #ffffff;">
+        
+        <!-- Elegant Header -->
+        <div class="p-5 text-center text-white" style="background: linear-gradient(135deg, #0d9488, #0f766e); position: relative;">
+            <div class="mb-3" style="font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));">🏥</div>
+            <h2 class="fw-bold mb-1" style="font-size: 26px; letter-spacing: -0.02em;">Create Account</h2>
+            <p class="mb-0 text-white-50 small">Sign up to get your medical orders delivered quickly</p>
         </div>
 
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" id="email" class="form-control" required>
+        <div class="card-body p-5">
+            <div id="register-alert" class="alert alert-danger d-none rounded-3 small" role="alert"></div>
+            <div id="register-success" class="alert alert-success d-none rounded-3 small" role="alert"></div>
+
+            <form id="register-form" onsubmit="event.preventDefault(); register_customer();">
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold small mb-2">Full Name</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-person"></i></span>
+                        <input type="text" id="customer_name" class="premium-input" placeholder="John Doe" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold small mb-2">Email Address</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-envelope"></i></span>
+                        <input type="email" id="email" class="premium-input" placeholder="john@example.com" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold small mb-2">Mobile Number</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-telephone"></i></span>
+                        <input type="tel" id="mobile" class="premium-input" placeholder="+1234567890">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold small mb-2">Password</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="password" class="premium-input" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold small mb-2">Confirm Password</label>
+                    <div class="premium-input-group">
+                        <span class="premium-input-icon"><i class="bi bi-check2-circle"></i></span>
+                        <input type="password" id="confirm_password" class="premium-input" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" id="btn-register" class="btn-premium-action">
+                        Register Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4 pt-2">
+                <p class="text-muted mb-0 small">Already have an account? <a href="/login?redirect-to={{ redirect_to|urlencode }}" class="text-decoration-none fw-bold text-teal">Sign In</a></p>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label>Mobile Number</label>
-            <input type="text" id="mobile" class="form-control" required>
-        </div>
-
-        <button type="button"
-                class="btn btn-primary"
-                onclick="register_customer()">
-            Register
-        </button>
-
-    </form>
+    </div>
 
 </div>
 
-<script>
+<!-- Styles for premium layout -->
+<style>
+    .shadow-premium {
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    }
+    
+    .premium-input-group {
+        display: flex;
+        align-items: center;
+        background: #f8fafc !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 50px !important;
+        padding: 2px 18px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-function register_customer(){
+    .premium-input-group:focus-within {
+        border-color: #0d9488 !important;
+        box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1) !important;
+        background: #ffffff !important;
+    }
+
+    .premium-input-icon {
+        font-size: 16px;
+        color: #64748b;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+    }
+
+    .premium-input {
+        flex: 1;
+        border: none !important;
+        background: transparent !important;
+        padding: 10px 0 !important;
+        outline: none !important;
+        font-size: 14px !important;
+        color: #0f172a !important;
+    }
+    
+    .premium-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .btn-premium-action {
+        background: linear-gradient(135deg, #0d9488, #0f766e) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 50px !important;
+        padding: 14px 24px !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        letter-spacing: -0.01em;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3) !important;
+    }
+
+    .btn-premium-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4) !important;
+    }
+
+    .btn-premium-action:active {
+        transform: translateY(1px);
+    }
+    
+    .text-teal {
+        color: #0d9488 !important;
+        transition: color 0.2s ease;
+    }
+    
+    .text-teal:hover {
+        color: #0f766e !important;
+    }
+</style>
+
+<!-- Bootstrap icons link if not loaded -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<script>
+function register_customer() {
+    const customer_name = $("#customer_name").val().trim();
+    const email = $("#email").val().trim();
+    const mobile = $("#mobile").val().trim();
+    const password = $("#password").val();
+    const confirm_password = $("#confirm_password").val();
+    
+    const alertBox = $("#register-alert");
+    const successBox = $("#register-success");
+    const registerBtn = $("#btn-register");
+
+    alertBox.addClass("d-none");
+    successBox.addClass("d-none");
+
+    if (password !== confirm_password) {
+        alertBox.text("Passwords do not match.").removeClass("d-none");
+        return;
+    }
+
+    // Validate Gmail requirements
+    const gmailErr = validateGmailAddress(email);
+    if (gmailErr) {
+        alertBox.html(gmailErr).removeClass("d-none");
+        return;
+    }
+
+    if (typeof validatePasswordRequirements === 'function') {
+        const pwdErr = validatePasswordRequirements(password, email);
+        if (pwdErr) {
+            alertBox.html(pwdErr).removeClass("d-none");
+      registerBtn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 8px;"></span> Creating Account...');
 
     frappe.call({
-
-        method:"hospital_pharmacy.hospital_pharmacy.api.register_customer",
-
-        args:{
-
-            customer_name:$("#customer_name").val(),
-            email:$("#email").val(),
-            mobile:$("#mobile").val()
-
+        method: "hospital_pharmacy.api.register_portal_user",
+        args: {
+            customer_name: customer_name,
+            email: email,
+            password: password,
+            mobile: mobile
         },
-
-        callback:function(r){
-
-            if(!r.exc){
-
-                frappe.msgprint("Customer Registered Successfully");
-
-                window.location="/checkout";
-
+        callback: function(r) {
+            if (r.message && r.message.status === "success") {
+                successBox.text("Registration successful! Redirecting...").removeClass("d-none");
+                setTimeout(function() {
+                    window.location.href = "{{ redirect_to|safe }}";
+                }, 1500);
+            } else {
+                registerBtn.prop("disabled", false).text("Register Account");
+                alertBox.text("Registration failed. Please try again.").removeClass("d-none");
             }
-
+        },
+        error: function(err) {
+            registerBtn.prop("disabled", false).text("Register Account");
+            let msg = "An error occurred during registration. Please verify your details.";
+            if (err._server_messages) {
+                try {
+                    let server_msgs = JSON.parse(err._server_messages);
+                    msg = server_msgs.map(m => JSON.parse(m).message).join("<br>");
+                } catch(e) {}
+            }
+            alertBox.html(msg).removeClass("d-none");
         }
-
     });
-
 }
 
+function validateGmailAddress(email) {
+    if (!email) return "Email address is required.";
+    email = email.trim();
+    
+    // Check if it ends with @gmail.com
+    const gmailSuffix = "@gmail.com";
+    if (!email.toLowerCase().endsWith(gmailSuffix)) {
+        return "Email address must end with @gmail.com.";
+    }
+    
+    // Extract username
+    const username = email.substring(0, email.length - gmailSuffix.length);
+    if (!username) {
+        return "Gmail username cannot be empty.";
+    }
+    
+    // Check allowed characters
+    const allowedChars = /^[a-zA-Z0-9\.]+$/;
+    if (!allowedChars.test(username)) {
+        return "Gmail username can only contain letters (a-z, A-Z), numbers (0-9), and periods (.).";
+    }
+    
+    // Start or end with period
+    if (username.startsWith('.') || username.endsWith('.')) {
+        return "Gmail username cannot start or end with a period (.).";
+    }
+    
+    // Consecutive periods
+    if (username.includes('..')) {
+        return "Gmail username cannot contain consecutive periods (..).";
+    }
+    
+    return null;
+}
 </script>
 
 {% endblock %}
